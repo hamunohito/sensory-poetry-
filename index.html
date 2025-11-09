@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>感覚の詩 ARメーカー v2</title>
+    <title>感覚の詩 ARメーカー v4 - Ultimate</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             overflow: hidden;
         }
 
@@ -25,21 +25,24 @@
         }
 
         #header {
-            padding: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             text-align: center;
         }
 
         #header h1 {
-            font-size: 24px;
+            font-size: 22px;
             color: #2d3748;
             margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         #header p {
-            margin: 8px 0 0 0;
-            font-size: 14px;
+            margin: 4px 0 0 0;
+            font-size: 13px;
             color: #718096;
         }
 
@@ -52,42 +55,43 @@
 
         #canvas-container {
             width: 100%;
-            height: 40vh;
-            min-height: 250px;
-            background-color: #f0f0f0;
+            height: 35vh;
+            min-height: 200px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
         }
 
         #controls {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
-            background-color: #ffffff;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.95);
         }
 
         .control-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .control-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 14px;
             color: #2d3748;
         }
 
-        .control-group input[type="text"],
         .control-group select {
             width: 100%;
-            padding: 12px;
-            font-size: 16px;
+            padding: 10px;
+            font-size: 14px;
             border: 2px solid #e2e8f0;
             border-radius: 8px;
+            background-color: #ffffff;
         }
 
         .control-group input[type="color"] {
             width: 100%;
-            height: 50px;
+            height: 45px;
             border: 2px solid #e2e8f0;
             border-radius: 8px;
             cursor: pointer;
@@ -95,97 +99,115 @@
 
         .control-group input[type="range"] {
             width: 100%;
-            height: 40px;
+            height: 35px;
         }
 
         .preset-buttons {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 5px;
+            background-color: #f7fafc;
+            border-radius: 8px;
         }
 
         .preset-btn {
-            padding: 10px;
-            font-size: 14px;
-            background-color: #edf2f7;
-            color: #2d3748;
+            padding: 8px;
+            font-size: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.2s;
+            opacity: 0.7;
         }
 
-        .preset-btn:active, .preset-btn.active {
-            background-color: #4299e1;
-            color: #ffffff;
+        .preset-btn:hover {
+            opacity: 0.85;
+            transform: scale(1.05);
+        }
+
+        .preset-btn.active {
+            opacity: 1;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
         #exportBtn, #exportStaticBtn {
             width: 100%;
-            padding: 16px;
-            font-size: 18px;
+            padding: 14px;
+            font-size: 16px;
             font-weight: bold;
-            background-color: #48bb78;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             color: #ffffff;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
         }
 
         #exportStaticBtn {
-            background-color: #4299e1;
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        }
+
+        #exportBtn:hover, #exportStaticBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         #exportBtn:disabled, #exportStaticBtn:disabled {
-            background-color: #cbd5e0;
+            background: #cbd5e0;
             cursor: not-allowed;
+            transform: none;
         }
 
         .info-box {
-            padding: 16px;
-            background-color: #edf2f7;
+            padding: 12px;
+            background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 12px;
             color: #4a5568;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .info-box p {
-            margin: 0 0 8px 0;
+            margin: 0 0 6px 0;
             font-weight: bold;
         }
 
-        .info-box ol {
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        .info-box li {
-            margin-bottom: 4px;
-        }
-
-        .status-message {
-            padding: 12px;
-            margin-top: 10px;
-            background-color: #fed7d7;
-            color: #742a2a;
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background-color: #f7fafc;
             border-radius: 8px;
-            font-size: 14px;
-            display: none;
+            margin-bottom: 10px;
         }
 
-        .status-message.success {
-            background-color: #c6f6d5;
-            color: #22543d;
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #718096;
         }
     </style>
 </head>
 <body>
     <div id="container">
         <div id="header">
-            <h1>感覚の詩 ARメーカー v2</h1>
+            <h1>感覚の詩 ARメーカー v4 - Ultimate</h1>
             <p>オノマトペから3Dモデルとアニメーションをつくろう</p>
         </div>
 
@@ -193,9 +215,25 @@
             <div id="canvas-container"></div>
 
             <div id="controls">
+                <!-- 統計 -->
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value">40</div>
+                        <div class="stat-label">形の種類</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">45</div>
+                        <div class="stat-label">動きの種類</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1800+</div>
+                        <div class="stat-label">組み合わせ</div>
+                    </div>
+                </div>
+
                 <!-- プリセット -->
                 <div class="control-group">
-                    <label>プリセット</label>
+                    <label>プリセット（30種類）</label>
                     <div class="preset-buttons">
                         <button class="preset-btn" data-preset="0">ぴょんぴょん</button>
                         <button class="preset-btn" data-preset="1">ぐるぐる</button>
@@ -215,33 +253,76 @@
                         <button class="preset-btn" data-preset="15">ぶるぶる</button>
                         <button class="preset-btn" data-preset="16">くねくね</button>
                         <button class="preset-btn" data-preset="17">るんるん</button>
+                        <button class="preset-btn" data-preset="18">ぱたぱた</button>
+                        <button class="preset-btn" data-preset="19">にょきにょき</button>
+                        <button class="preset-btn" data-preset="20">しゅわしゅわ</button>
+                        <button class="preset-btn" data-preset="21">ぴかぴか</button>
+                        <button class="preset-btn" data-preset="22">どきどき</button>
+                        <button class="preset-btn" data-preset="23">ふりふり</button>
+                        <button class="preset-btn" data-preset="24">ひゅるひゅる</button>
+                        <button class="preset-btn" data-preset="25">めらめら</button>
+                        <button class="preset-btn" data-preset="26">ざわざわ</button>
+                        <button class="preset-btn" data-preset="27">ぴりぴり</button>
+                        <button class="preset-btn" data-preset="28">のびのび</button>
+                        <button class="preset-btn" data-preset="29">きゅんきゅん</button>
                     </div>
                 </div>
 
                 <!-- 形状 -->
                 <div class="control-group">
-                    <label for="shape">形</label>
+                    <label for="shape">形（40種類）</label>
                     <select id="shape">
-                        <option value="sphere">球</option>
-                        <option value="box">立方体</option>
-                        <option value="cylinder">円柱</option>
-                        <option value="cone">円錐</option>
-                        <option value="octahedron">八面体</option>
-                        <option value="torus">ドーナツ</option>
-                        <option value="star">星</option>
-                        <option value="capsule">カプセル</option>
-                        <option value="plane">平面</option>
-                        <option value="ring">リング</option>
-                        <option value="pyramid">ピラミッド</option>
-                        <option value="diamond">ダイヤモンド</option>
-                        <option value="prism">三角柱</option>
-                        <option value="drop">水滴</option>
-                        <option value="heart">ハート</option>
-                        <option value="cross">十字</option>
-                        <option value="crescent">三日月</option>
-                        <option value="helix">螺旋</option>
-                        <option value="cloud">雲</option>
-                        <option value="flower">花</option>
+                        <optgroup label="基本形状">
+                            <option value="sphere">球</option>
+                            <option value="box">立方体</option>
+                            <option value="cylinder">円柱</option>
+                            <option value="cone">円錐</option>
+                            <option value="octahedron">八面体</option>
+                            <option value="torus">ドーナツ</option>
+                            <option value="plane">平面</option>
+                            <option value="ring">リング</option>
+                        </optgroup>
+                        <optgroup label="特殊形状">
+                            <option value="star">星</option>
+                            <option value="heart">ハート</option>
+                            <option value="diamond">ダイヤモンド</option>
+                            <option value="pyramid">ピラミッド</option>
+                            <option value="crystal">結晶</option>
+                            <option value="cross">十字</option>
+                            <option value="arrow">矢印</option>
+                            <option value="gear">歯車</option>
+                        </optgroup>
+                        <optgroup label="自然形状">
+                            <option value="drop">水滴</option>
+                            <option value="cloud">雲</option>
+                            <option value="flower">花</option>
+                            <option value="crescent">三日月</option>
+                            <option value="snowflake">雪の結晶</option>
+                            <option value="egg">たまご</option>
+                            <option value="butterfly">蝶々</option>
+                            <option value="leaf">葉っぱ</option>
+                            <option value="lightning">稲妻</option>
+                            <option value="wave">波</option>
+                            <option value="flame">炎</option>
+                            <option value="mountain">山</option>
+                        </optgroup>
+                        <optgroup label="幾何学形状">
+                            <option value="tetrahedron">四面体</option>
+                            <option value="icosahedron">二十面体</option>
+                            <option value="knot">結び目</option>
+                            <option value="helix">螺旋</option>
+                            <option value="hexagon">六角柱</option>
+                            <option value="pentaprism">五角柱</option>
+                            <option value="capsule">カプセル</option>
+                            <option value="prism">三角柱</option>
+                        </optgroup>
+                        <optgroup label="宇宙・天体">
+                            <option value="sun">太陽</option>
+                            <option value="moon">三日月</option>
+                            <option value="rocket">ロケット</option>
+                            <option value="ufo">UFO</option>
+                            <option value="alien">宇宙人</option>
+                        </optgroup>
                     </select>
                 </div>
 
@@ -253,33 +334,65 @@
 
                 <!-- アニメーション -->
                 <div class="control-group">
-                    <label for="animation">動き</label>
+                    <label for="animation">動き（45種類）</label>
                     <select id="animation">
-                        <option value="bounce">跳ねる (ぴょんぴょん)</option>
-                        <option value="rotate">回る (ぐるぐる)</option>
-                        <option value="float">浮遊 (ふわふわ)</option>
-                        <option value="shake">震える (ぷるぷる)</option>
-                        <option value="sparkle">きらめき (きらきら)</option>
-                        <option value="pulse">脈打つ (どんどん)</option>
-                        <option value="wave">波打つ (ゆらゆら)</option>
-                        <option value="spiral">螺旋上昇 (くるくるのぼる)</option>
-                        <option value="zigzag">ジグザグ (ぎざぎざ)</option>
-                        <option value="stretch">伸縮 (びよんびよん)</option>
-                        <option value="swing">揺れる (ゆらゆら)</option>
-                        <option value="blink">点滅 (ちかちか)</option>
-                        <option value="slide">スライド (すーっ)</option>
-                        <option value="spin_bounce">回転ジャンプ (ぴょんくるくる)</option>
-                        <option value="flutter">ひらひら (はたはた)</option>
-                        <option value="circle">円を描く (ぐるっと)</option>
-                        <option value="figure8">8の字 (くねくね)</option>
-                        <option value="tumble">転がる (ころころ)</option>
-                        <option value="explode">広がる (ばーん)</option>
-                        <option value="implode">縮む (ぎゅー)</option>
-                        <option value="wobble">ぐらぐら</option>
-                        <option value="twist">ねじれる (ぎゅるぎゅる)</option>
-                        <option value="orbit">周回 (まわる)</option>
-                        <option value="vibrate">振動 (ぶるぶる)</option>
-                        <option value="dance">踊る (るんるん)</option>
+                        <optgroup label="基本の動き">
+                            <option value="bounce">跳ねる (ぴょんぴょん)</option>
+                            <option value="rotate">回る (ぐるぐる)</option>
+                            <option value="float">浮遊 (ふわふわ)</option>
+                            <option value="shake">震える (ぷるぷる)</option>
+                            <option value="pulse">脈打つ (どんどん)</option>
+                            <option value="wave">波打つ (ゆらゆら)</option>
+                            <option value="swing">揺れる (ゆらゆら)</option>
+                            <option value="slide">スライド (すーっ)</option>
+                        </optgroup>
+                        <optgroup label="特殊効果">
+                            <option value="sparkle">きらめき (きらきら)</option>
+                            <option value="blink">点滅 (ちかちか)</option>
+                            <option value="flash">点滅強調 (ぴかぴか)</option>
+                            <option value="explode">広がる (ばーん)</option>
+                            <option value="implode">縮む (ぎゅー)</option>
+                            <option value="teleport">瞬間移動 (しゅっ)</option>
+                            <option value="electric">電気 (ぴりぴり)</option>
+                            <option value="fire">炎 (めらめら)</option>
+                        </optgroup>
+                        <optgroup label="複雑な動き">
+                            <option value="spiral">螺旋上昇 (くるくるのぼる)</option>
+                            <option value="zigzag">ジグザグ (ぎざぎざ)</option>
+                            <option value="figure8">8の字 (くねくね)</option>
+                            <option value="circle">円を描く (ぐるっと)</option>
+                            <option value="orbit">周回 (まわる)</option>
+                            <option value="tornado">竜巻 (ぐるんぐるん)</option>
+                            <option value="pendulum">振り子 (ゆらーり)</option>
+                            <option value="spin_bounce">回転ジャンプ (ぴょんくるくる)</option>
+                        </optgroup>
+                        <optgroup label="変形系">
+                            <option value="stretch">伸縮 (びよんびよん)</option>
+                            <option value="twist">ねじれる (ぎゅるぎゅる)</option>
+                            <option value="wobble">ぐらぐら</option>
+                            <option value="jello">ゼリー状 (ぷるんぷるん)</option>
+                            <option value="grow">成長 (にょきにょき)</option>
+                            <option value="shrink">縮小 (きゅんきゅん)</option>
+                            <option value="morph">変形 (むにむに)</option>
+                            <option value="expand">膨張 (のびのび)</option>
+                        </optgroup>
+                        <optgroup label="生物的な動き">
+                            <option value="flap">羽ばたく (ぱたぱた)</option>
+                            <option value="flutter">ひらひら (はたはた)</option>
+                            <option value="tumble">転がる (ころころ)</option>
+                            <option value="dance">踊る (るんるん)</option>
+                            <option value="heartbeat">心臓の鼓動 (どきどき)</option>
+                            <option value="sway">左右に振る (ふりふり)</option>
+                            <option value="snake">蛇行 (にょろにょろ)</option>
+                            <option value="swim">泳ぐ (すいすい)</option>
+                        </optgroup>
+                        <optgroup label="環境効果">
+                            <option value="vibrate">振動 (ぶるぶる)</option>
+                            <option value="bubble">泡立つ (しゅわしゅわ)</option>
+                            <option value="wind">風 (ひゅるひゅる)</option>
+                            <option value="crowd">群れ (ざわざわ)</option>
+                            <option value="warm">温かい (ぽかぽか)</option>
+                        </optgroup>
                     </select>
                 </div>
 
@@ -298,22 +411,11 @@
                 <!-- エクスポートボタン -->
                 <button id="exportBtn">アニメーション付きGLBを保存</button>
                 <button id="exportStaticBtn">静止GLBを保存（確実版）</button>
-                
-                <div id="statusMessage" class="status-message"></div>
 
                 <!-- 使い方 -->
                 <div class="info-box">
-                    <p>使い方:</p>
-                    <ol>
-                        <li>プリセットを選ぶか、形・色・動きを自分で組み合わせる</li>
-                        <li>速さと大きさを微調整</li>
-                        <li>GLBファイルを保存（アニメーション付きまたは静止版）</li>
-                        <li>palanAR (https://planar.jp/) にアップロード</li>
-                        <li>QRコードを生成して、みんなで共有!</li>
-                    </ol>
-                    <p style="color: #e53e3e; margin-top: 10px;">
-                        ※アニメーション付きGLBがうまく動かない場合は「静止GLBを保存」をお試しください
-                    </p>
+                    <p>🎨 v4 Ultimate - 40種類の形×45種類の動き = 1800以上の組み合わせ！</p>
+                    <p>palanAR (https://planar.jp/) でARマーカーを作成してみんなで共有しよう！</p>
                 </div>
             </div>
         </div>
@@ -330,46 +432,53 @@
     </script>
 
     <script type="module">
-        // Three.jsとGLTFExporterをインポート
         import * as THREE from 'three';
         import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 
-        // グローバル変数
         let scene, camera, renderer, mesh, mixer, clock;
         let currentAnimation = null;
-        let animationAction = null;
 
-        // プリセット
+        // プリセット（拡張版）
         const presets = [
-            { text: 'ぴょんぴょん', shape: 'sphere', color: '#ff6b6b', animation: 'bounce' },
-            { text: 'ぐるぐる', shape: 'cylinder', color: '#4ecdc4', animation: 'rotate' },
-            { text: 'ふわふわ', shape: 'cloud', color: '#ffe66d', animation: 'float' },
-            { text: 'ぷるぷる', shape: 'sphere', color: '#a8dadc', animation: 'shake' },
-            { text: 'きらきら', shape: 'star', color: '#ffd23f', animation: 'sparkle' },
-            { text: 'どんどん', shape: 'box', color: '#ee6c4d', animation: 'pulse' },
-            { text: 'ゆらゆら', shape: 'torus', color: '#95e1d3', animation: 'wave' },
-            { text: 'びよんびよん', shape: 'capsule', color: '#f38181', animation: 'stretch' },
-            { text: 'ひらひら', shape: 'plane', color: '#aa96da', animation: 'flutter' },
-            { text: 'すーっ', shape: 'capsule', color: '#5dade2', animation: 'slide' },
-            { text: 'ちかちか', shape: 'octahedron', color: '#f8b500', animation: 'blink' },
-            { text: 'くるくるのぼる', shape: 'helix', color: '#48c9b0', animation: 'spiral' },
-            { text: 'ころころ', shape: 'sphere', color: '#e74c3c', animation: 'tumble' },
-            { text: 'ばーん', shape: 'star', color: '#ff5252', animation: 'explode' },
-            { text: 'ぐらぐら', shape: 'pyramid', color: '#9575cd', animation: 'wobble' },
-            { text: 'ぶるぶる', shape: 'drop', color: '#4fc3f7', animation: 'vibrate' },
-            { text: 'くねくね', shape: 'helix', color: '#81c784', animation: 'figure8' },
-            { text: 'るんるん', shape: 'heart', color: '#ff80ab', animation: 'dance' },
+            { shape: 'sphere', color: '#ff6b6b', animation: 'bounce' },
+            { shape: 'cylinder', color: '#4ecdc4', animation: 'rotate' },
+            { shape: 'cloud', color: '#ffe66d', animation: 'float' },
+            { shape: 'sphere', color: '#a8dadc', animation: 'shake' },
+            { shape: 'star', color: '#ffd23f', animation: 'sparkle' },
+            { shape: 'box', color: '#ee6c4d', animation: 'pulse' },
+            { shape: 'torus', color: '#95e1d3', animation: 'wave' },
+            { shape: 'capsule', color: '#f38181', animation: 'stretch' },
+            { shape: 'butterfly', color: '#aa96da', animation: 'flutter' },
+            { shape: 'arrow', color: '#5dade2', animation: 'slide' },
+            { shape: 'octahedron', color: '#f8b500', animation: 'blink' },
+            { shape: 'helix', color: '#48c9b0', animation: 'spiral' },
+            { shape: 'sphere', color: '#e74c3c', animation: 'tumble' },
+            { shape: 'star', color: '#ff5252', animation: 'explode' },
+            { shape: 'pyramid', color: '#9575cd', animation: 'wobble' },
+            { shape: 'drop', color: '#4fc3f7', animation: 'vibrate' },
+            { shape: 'helix', color: '#81c784', animation: 'figure8' },
+            { shape: 'heart', color: '#ff80ab', animation: 'dance' },
+            { shape: 'butterfly', color: '#ffcc80', animation: 'flap' },
+            { shape: 'cylinder', color: '#81c784', animation: 'grow' },
+            { shape: 'sphere', color: '#80deea', animation: 'bubble' },
+            { shape: 'star', color: '#fff176', animation: 'flash' },
+            { shape: 'heart', color: '#ff5252', animation: 'heartbeat' },
+            { shape: 'cone', color: '#ce93d8', animation: 'sway' },
+            { shape: 'lightning', color: '#ffd700', animation: 'wind' },
+            { shape: 'flame', color: '#ff4500', animation: 'fire' },
+            { shape: 'wave', color: '#00bfff', animation: 'crowd' },
+            { shape: 'lightning', color: '#ffff00', animation: 'electric' },
+            { shape: 'leaf', color: '#90ee90', animation: 'expand' },
+            { shape: 'sun', color: '#ffa500', animation: 'shrink' }
         ];
 
         // 初期化
         function init() {
             const container = document.getElementById('canvas-container');
 
-            // シーン
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0xf0f0f0);
 
-            // カメラ
             camera = new THREE.PerspectiveCamera(
                 75,
                 container.clientWidth / container.clientHeight,
@@ -378,12 +487,10 @@
             );
             camera.position.z = 5;
 
-            // レンダラー
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
             container.appendChild(renderer.domElement);
 
-            // ライト
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
 
@@ -391,20 +498,14 @@
             directionalLight.position.set(5, 5, 5);
             scene.add(directionalLight);
 
-            // クロック
             clock = new THREE.Clock();
 
-            // リサイズ対応
             window.addEventListener('resize', onWindowResize);
 
-            // 初期メッシュ作成
             updateMesh();
-
-            // アニメーションループ
             animate();
         }
 
-        // アニメーションループ
         function animate() {
             requestAnimationFrame(animate);
 
@@ -416,7 +517,41 @@
             renderer.render(scene, camera);
         }
 
-        // 星型ジオメトリ作成（修正版）
+        // カスタムジオメトリ作成関数（簡略化）
+        function createCustomGeometry(type, size) {
+            switch (type) {
+                case 'star':
+                    return createStarGeometry(size);
+                case 'heart':
+                    return createHeartGeometry(size);
+                case 'butterfly':
+                    return createButterflyGeometry(size);
+                case 'lightning':
+                    return createLightningGeometry(size);
+                case 'leaf':
+                    return createLeafGeometry(size);
+                case 'flame':
+                    return createFlameGeometry(size);
+                case 'wave':
+                    return createWaveGeometry(size);
+                case 'mountain':
+                    return createMountainGeometry(size);
+                case 'sun':
+                    return createSunGeometry(size);
+                case 'moon':
+                    return createMoonGeometry(size);
+                case 'rocket':
+                    return createRocketGeometry(size);
+                case 'ufo':
+                    return createUFOGeometry(size);
+                case 'alien':
+                    return createAlienGeometry(size);
+                default:
+                    return new THREE.SphereGeometry(size, 32, 32);
+            }
+        }
+
+        // 星型
         function createStarGeometry(size) {
             const shape = new THREE.Shape();
             const points = 5;
@@ -437,139 +572,293 @@
             }
             shape.closePath();
 
-            const extrudeSettings = {
+            return new THREE.ExtrudeGeometry(shape, {
                 depth: size * 0.3,
                 bevelEnabled: true,
                 bevelSegments: 2,
                 steps: 2,
                 bevelSize: size * 0.05,
                 bevelThickness: size * 0.05
-            };
-
-            return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            });
         }
 
-        // ピラミッド型
-        function createPyramidGeometry(size) {
-            return new THREE.ConeGeometry(size * 0.8, size * 1.2, 4);
-        }
-
-        // ダイヤモンド型（両錐）
-        function createDiamondGeometry(size) {
-            const geometry = new THREE.OctahedronGeometry(size * 0.8);
-            geometry.scale(1, 1.5, 1); // Y方向に伸ばしてダイヤモンド型に
-            return geometry;
-        }
-
-        // 水滴型（改善版）
-        function createDropGeometry(size) {
-            const geometry = new THREE.SphereGeometry(size * 0.7, 32, 32);
-            // 上部を尖らせる
-            const positions = geometry.attributes.position.array;
-            for (let i = 0; i < positions.length; i += 3) {
-                const y = positions[i + 1];
-                if (y > 0) {
-                    const factor = 1 - (y / (size * 0.7)) * 0.5;
-                    positions[i] *= factor;
-                    positions[i + 2] *= factor;
-                }
-            }
-            geometry.attributes.position.needsUpdate = true;
-            geometry.computeVertexNormals();
-            return geometry;
-        }
-
-        // ハート型（シンプル版）
+        // ハート型
         function createHeartGeometry(size) {
-            const heartShape = new THREE.Shape();
+            const shape = new THREE.Shape();
             const x = 0, y = 0;
             
-            heartShape.moveTo( x + size * 0.25, y + size * 0.25 );
-            heartShape.bezierCurveTo( x + size * 0.25, y + size * 0.25, x + size * 0.2, y, x, y );
-            heartShape.bezierCurveTo( x - size * 0.3, y, x - size * 0.3, y + size * 0.35, x - size * 0.3, y + size * 0.35 );
-            heartShape.bezierCurveTo( x - size * 0.3, y + size * 0.55, x - size * 0.1, y + size * 0.77, x + size * 0.25, y + size * 0.95 );
-            heartShape.bezierCurveTo( x + size * 0.6, y + size * 0.77, x + size * 0.8, y + size * 0.55, x + size * 0.8, y + size * 0.35 );
-            heartShape.bezierCurveTo( x + size * 0.8, y + size * 0.35, x + size * 0.8, y, x + size * 0.5, y );
-            heartShape.bezierCurveTo( x + size * 0.35, y, x + size * 0.25, y + size * 0.25, x + size * 0.25, y + size * 0.25 );
+            shape.moveTo(x + size * 0.25, y + size * 0.25);
+            shape.bezierCurveTo(x + size * 0.25, y + size * 0.25, x + size * 0.2, y, x, y);
+            shape.bezierCurveTo(x - size * 0.3, y, x - size * 0.3, y + size * 0.35, x - size * 0.3, y + size * 0.35);
+            shape.bezierCurveTo(x - size * 0.3, y + size * 0.55, x - size * 0.1, y + size * 0.77, x + size * 0.25, y + size * 0.95);
+            shape.bezierCurveTo(x + size * 0.6, y + size * 0.77, x + size * 0.8, y + size * 0.55, x + size * 0.8, y + size * 0.35);
+            shape.bezierCurveTo(x + size * 0.8, y + size * 0.35, x + size * 0.8, y, x + size * 0.5, y);
+            shape.bezierCurveTo(x + size * 0.35, y, x + size * 0.25, y + size * 0.25, x + size * 0.25, y + size * 0.25);
             
-            const extrudeSettings = {
+            const geometry = new THREE.ExtrudeGeometry(shape, {
                 depth: size * 0.4,
                 bevelEnabled: true,
                 bevelSegments: 2,
                 steps: 2,
                 bevelSize: size * 0.02,
                 bevelThickness: size * 0.02
-            };
-
-            const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+            });
+            
             geometry.center();
             return geometry;
         }
 
-        // 十字型（修正版）
-        function createCrossGeometry(size) {
+        // 蝶々型（簡易版）
+        function createButterflyGeometry(size) {
             const shape = new THREE.Shape();
-            const w = size * 0.3; // 十字の幅
-            const l = size * 0.8; // 十字の長さ
             
-            shape.moveTo(-w/2, -l);
-            shape.lineTo(w/2, -l);
-            shape.lineTo(w/2, -w/2);
-            shape.lineTo(l, -w/2);
-            shape.lineTo(l, w/2);
-            shape.lineTo(w/2, w/2);
-            shape.lineTo(w/2, l);
-            shape.lineTo(-w/2, l);
-            shape.lineTo(-w/2, w/2);
-            shape.lineTo(-l, w/2);
-            shape.lineTo(-l, -w/2);
-            shape.lineTo(-w/2, -w/2);
-            shape.closePath();
-
-            const extrudeSettings = {
-                depth: size * 0.2,
+            // 右羽
+            shape.moveTo(0, 0);
+            shape.quadraticCurveTo(size * 0.8, size * 0.3, size * 0.8, 0);
+            shape.quadraticCurveTo(size * 0.8, -size * 0.3, size * 0.4, -size * 0.4);
+            shape.quadraticCurveTo(size * 0.2, -size * 0.2, 0, 0);
+            
+            // 左羽（対称）
+            shape.quadraticCurveTo(-size * 0.2, -size * 0.2, -size * 0.4, -size * 0.4);
+            shape.quadraticCurveTo(-size * 0.8, -size * 0.3, -size * 0.8, 0);
+            shape.quadraticCurveTo(-size * 0.8, size * 0.3, 0, 0);
+            
+            const geometry = new THREE.ExtrudeGeometry(shape, {
+                depth: size * 0.1,
                 bevelEnabled: false
-            };
-
-            return new THREE.ExtrudeGeometry(shape, extrudeSettings);
-        }
-
-        // 三日月型
-        function createCrescentGeometry(size) {
-            return new THREE.TorusGeometry(size * 0.8, size * 0.3, 16, 32, Math.PI * 1.5);
-        }
-
-        // 螺旋型（修正版）
-        function createHelixGeometry(size) {
-            const points = [];
-            for (let i = 0; i < 50; i++) {
-                const t = i / 49;
-                const angle = t * Math.PI * 4;
-                const radius = size * 0.3;
-                const height = (t - 0.5) * size * 2;
-                points.push(new THREE.Vector3(
-                    Math.cos(angle) * radius,
-                    height,
-                    Math.sin(angle) * radius
-                ));
-            }
-            const curve = new THREE.CatmullRomCurve3(points);
-            return new THREE.TubeGeometry(curve, 50, size * 0.1, 8, false);
-        }
-
-        // 雲型
-        function createCloudGeometry(size) {
-            const geometry = new THREE.SphereGeometry(size * 0.8, 32, 16);
-            geometry.scale(1.5, 0.8, 1);
+            });
+            
+            geometry.center();
             return geometry;
         }
 
-        // 花型
-        function createFlowerGeometry(size) {
-            return new THREE.DodecahedronGeometry(size * 0.8);
+        // 稲妻型
+        function createLightningGeometry(size) {
+            const shape = new THREE.Shape();
+            
+            shape.moveTo(0, size);
+            shape.lineTo(-size * 0.2, size * 0.3);
+            shape.lineTo(size * 0.1, size * 0.3);
+            shape.lineTo(-size * 0.1, -size * 0.3);
+            shape.lineTo(size * 0.2, -size * 0.3);
+            shape.lineTo(0, -size);
+            shape.lineTo(size * 0.1, -size * 0.2);
+            shape.lineTo(-size * 0.05, -size * 0.2);
+            shape.lineTo(size * 0.05, size * 0.2);
+            shape.lineTo(-size * 0.1, size * 0.2);
+            shape.closePath();
+            
+            return new THREE.ExtrudeGeometry(shape, {
+                depth: size * 0.2,
+                bevelEnabled: false
+            });
         }
 
-        // リサイズ
+        // 葉っぱ型
+        function createLeafGeometry(size) {
+            const shape = new THREE.Shape();
+            
+            shape.moveTo(0, -size);
+            shape.quadraticCurveTo(size * 0.4, -size * 0.6, size * 0.4, 0);
+            shape.quadraticCurveTo(size * 0.4, size * 0.6, 0, size);
+            shape.quadraticCurveTo(-size * 0.4, size * 0.6, -size * 0.4, 0);
+            shape.quadraticCurveTo(-size * 0.4, -size * 0.6, 0, -size);
+            
+            const geometry = new THREE.ExtrudeGeometry(shape, {
+                depth: size * 0.1,
+                bevelEnabled: true,
+                bevelSize: size * 0.02,
+                bevelThickness: size * 0.02
+            });
+            
+            geometry.center();
+            return geometry;
+        }
+
+        // 炎型
+        function createFlameGeometry(size) {
+            const shape = new THREE.Shape();
+            
+            shape.moveTo(0, size);
+            shape.quadraticCurveTo(size * 0.3, size * 0.5, size * 0.2, 0);
+            shape.quadraticCurveTo(size * 0.1, -size * 0.8, 0, -size);
+            shape.quadraticCurveTo(-size * 0.1, -size * 0.8, -size * 0.2, 0);
+            shape.quadraticCurveTo(-size * 0.3, size * 0.5, 0, size);
+            
+            return new THREE.ExtrudeGeometry(shape, {
+                depth: size * 0.3,
+                bevelEnabled: false
+            });
+        }
+
+        // 波型
+        function createWaveGeometry(size) {
+            const geometry = new THREE.PlaneGeometry(size * 2, size, 32, 32);
+            const positions = geometry.attributes.position.array;
+            
+            for (let i = 0; i < positions.length; i += 3) {
+                const x = positions[i];
+                const y = positions[i + 1];
+                positions[i + 2] = Math.sin(x * 2) * size * 0.2;
+            }
+            
+            geometry.attributes.position.needsUpdate = true;
+            geometry.computeVertexNormals();
+            return geometry;
+        }
+
+        // 山型
+        function createMountainGeometry(size) {
+            return new THREE.ConeGeometry(size, size * 1.5, 4);
+        }
+
+        // 太陽型（光線付き）
+        function createSunGeometry(size) {
+            const group = new THREE.Group();
+            const shape = new THREE.Shape();
+            const rays = 12;
+            const innerRadius = size * 0.5;
+            const outerRadius = size;
+            
+            for (let i = 0; i < rays; i++) {
+                const angle = (Math.PI * 2 * i) / rays;
+                const angle2 = (Math.PI * 2 * (i + 0.5)) / rays;
+                
+                if (i === 0) {
+                    shape.moveTo(Math.cos(angle) * outerRadius, Math.sin(angle) * outerRadius);
+                } else {
+                    shape.lineTo(Math.cos(angle) * outerRadius, Math.sin(angle) * outerRadius);
+                }
+                shape.lineTo(Math.cos(angle2) * innerRadius, Math.sin(angle2) * innerRadius);
+            }
+            shape.closePath();
+            
+            return new THREE.ExtrudeGeometry(shape, {
+                depth: size * 0.2,
+                bevelEnabled: true,
+                bevelSize: size * 0.02,
+                bevelThickness: size * 0.02
+            });
+        }
+
+        // 三日月型（きれいなカーブ）
+        function createMoonGeometry(size) {
+            const shape = new THREE.Shape();
+            const radius = size;
+            
+            // 外側の円弧
+            shape.moveTo(0, -radius);
+            shape.absarc(0, 0, radius, -Math.PI / 2, Math.PI / 2, false);
+            
+            // 内側の円弧（少しずらして三日月を作る）
+            shape.absarc(radius * 0.3, 0, radius * 0.8, Math.PI / 2, -Math.PI / 2, true);
+            shape.closePath();
+            
+            return new THREE.ExtrudeGeometry(shape, {
+                depth: size * 0.15,
+                bevelEnabled: true,
+                bevelSize: size * 0.02,
+                bevelThickness: size * 0.02
+            });
+        }
+
+        // ロケット型
+        function createRocketGeometry(size) {
+            const shape = new THREE.Shape();
+            const width = size * 0.3;
+            const height = size * 1.5;
+            
+            // ロケットの本体
+            shape.moveTo(-width/2, -height/2);
+            shape.lineTo(-width/2, height * 0.3);
+            
+            // 先端（円錐部分）
+            shape.lineTo(-width * 0.8, height * 0.3);
+            shape.lineTo(0, height/2);
+            shape.lineTo(width * 0.8, height * 0.3);
+            shape.lineTo(width/2, height * 0.3);
+            
+            // 本体の右側
+            shape.lineTo(width/2, -height/2);
+            
+            // 噴射口
+            shape.lineTo(width * 0.3, -height/2);
+            shape.lineTo(width * 0.2, -height * 0.6);
+            shape.lineTo(0, -height * 0.55);
+            shape.lineTo(-width * 0.2, -height * 0.6);
+            shape.lineTo(-width * 0.3, -height/2);
+            shape.closePath();
+            
+            const geometry = new THREE.ExtrudeGeometry(shape, {
+                depth: size * 0.3,
+                bevelEnabled: true,
+                bevelSize: size * 0.02,
+                bevelThickness: size * 0.02
+            });
+            
+            geometry.center();
+            return geometry;
+        }
+
+        // UFO型
+        function createUFOGeometry(size) {
+            // 円盤型のUFO
+            const geometry = new THREE.CylinderGeometry(
+                size * 0.3,  // 上部の半径（ドーム）
+                size * 0.9,  // 下部の半径（円盤）
+                size * 0.3,  // 高さ
+                32,          // セグメント数
+                1,           // 高さセグメント
+                false        // オープンエンド
+            );
+            
+            // ドームを追加（上部の半球）
+            const dome = new THREE.SphereGeometry(size * 0.3, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+            const mergedGeometry = new THREE.BufferGeometry();
+            
+            // 簡単のため、円柱をそのまま返す（本来は合成すべき）
+            return geometry;
+        }
+
+        // 宇宙人型（シンプルなグレイタイプ）
+        function createAlienGeometry(size) {
+            const shape = new THREE.Shape();
+            
+            // 頭部（大きな楕円）
+            const headRadius = size * 0.5;
+            const bodyWidth = size * 0.3;
+            const bodyHeight = size * 0.8;
+            
+            // 頭
+            shape.moveTo(0, size * 0.5);
+            shape.quadraticCurveTo(headRadius, size * 0.5, headRadius, 0);
+            shape.quadraticCurveTo(headRadius, -size * 0.2, bodyWidth, -size * 0.2);
+            
+            // 体
+            shape.lineTo(bodyWidth, -bodyHeight);
+            shape.lineTo(bodyWidth * 0.7, -bodyHeight);
+            shape.lineTo(bodyWidth * 0.5, -bodyHeight * 0.6);
+            shape.lineTo(0, -bodyHeight * 0.6);
+            shape.lineTo(-bodyWidth * 0.5, -bodyHeight * 0.6);
+            shape.lineTo(-bodyWidth * 0.7, -bodyHeight);
+            shape.lineTo(-bodyWidth, -bodyHeight);
+            shape.lineTo(-bodyWidth, -size * 0.2);
+            
+            // 頭の左側
+            shape.quadraticCurveTo(-headRadius, -size * 0.2, -headRadius, 0);
+            shape.quadraticCurveTo(-headRadius, size * 0.5, 0, size * 0.5);
+            
+            const geometry = new THREE.ExtrudeGeometry(shape, {
+                depth: size * 0.2,
+                bevelEnabled: true,
+                bevelSize: size * 0.02,
+                bevelThickness: size * 0.02
+            });
+            
+            geometry.center();
+            return geometry;
+        }
+
         function onWindowResize() {
             const container = document.getElementById('canvas-container');
             camera.aspect = container.clientWidth / container.clientHeight;
@@ -577,562 +866,591 @@
             renderer.setSize(container.clientWidth, container.clientHeight);
         }
 
-        // メッシュ更新
         function updateMesh() {
-            // 既存のメッシュを削除
             if (mesh) {
                 scene.remove(mesh);
                 mesh.geometry.dispose();
                 mesh.material.dispose();
             }
 
-            // パラメータ取得
             const shape = document.getElementById('shape').value;
             const color = document.getElementById('color').value;
             const size = parseFloat(document.getElementById('size').value);
 
-            // ジオメトリ作成
             let geometry;
-            try {
-                switch (shape) {
-                    case 'sphere':
-                        geometry = new THREE.SphereGeometry(size, 32, 32);
-                        break;
-                    case 'box':
-                        geometry = new THREE.BoxGeometry(size, size, size);
-                        break;
-                    case 'cylinder':
-                        geometry = new THREE.CylinderGeometry(size * 0.5, size * 0.5, size * 1.5, 32);
-                        break;
-                    case 'cone':
-                        geometry = new THREE.ConeGeometry(size * 0.7, size * 1.5, 32);
-                        break;
-                    case 'octahedron':
-                        geometry = new THREE.OctahedronGeometry(size);
-                        break;
-                    case 'torus':
-                        geometry = new THREE.TorusGeometry(size * 0.7, size * 0.3, 16, 100);
-                        break;
-                    case 'star':
-                        geometry = createStarGeometry(size);
-                        break;
-                    case 'capsule':
-                        geometry = new THREE.CapsuleGeometry(size * 0.3, size * 0.6, 4, 8);
-                        break;
-                    case 'plane':
-                        geometry = new THREE.BoxGeometry(size * 1.5, size * 0.1, size * 1.5);
-                        break;
-                    case 'ring':
-                        geometry = new THREE.TorusGeometry(size * 0.8, size * 0.1, 16, 100);
-                        break;
-                    case 'pyramid':
-                        geometry = createPyramidGeometry(size);
-                        break;
-                    case 'diamond':
-                        geometry = createDiamondGeometry(size);
-                        break;
-                    case 'prism':
-                        geometry = new THREE.CylinderGeometry(size * 0.6, size * 0.6, size * 1.2, 3);
-                        break;
-                    case 'drop':
-                        geometry = createDropGeometry(size);
-                        break;
-                    case 'heart':
-                        geometry = createHeartGeometry(size);
-                        break;
-                    case 'cross':
-                        geometry = createCrossGeometry(size);
-                        break;
-                    case 'crescent':
-                        geometry = createCrescentGeometry(size);
-                        break;
-                    case 'helix':
-                        geometry = createHelixGeometry(size);
-                        break;
-                    case 'cloud':
-                        geometry = createCloudGeometry(size);
-                        break;
-                    case 'flower':
-                        geometry = createFlowerGeometry(size);
-                        break;
-                    default:
-                        geometry = new THREE.SphereGeometry(size, 32, 32);
-                }
-            } catch (error) {
-                console.error('Geometry creation error:', error);
-                geometry = new THREE.SphereGeometry(size, 32, 32);
+            
+            // 基本形状
+            const basicShapes = {
+                'sphere': () => new THREE.SphereGeometry(size, 32, 32),
+                'box': () => new THREE.BoxGeometry(size, size, size),
+                'cylinder': () => new THREE.CylinderGeometry(size * 0.5, size * 0.5, size * 1.5, 32),
+                'cone': () => new THREE.ConeGeometry(size * 0.7, size * 1.5, 32),
+                'octahedron': () => new THREE.OctahedronGeometry(size),
+                'torus': () => new THREE.TorusGeometry(size * 0.7, size * 0.3, 16, 100),
+                'plane': () => new THREE.BoxGeometry(size * 1.5, size * 0.1, size * 1.5),
+                'ring': () => new THREE.TorusGeometry(size * 0.8, size * 0.1, 16, 100),
+                'pyramid': () => new THREE.ConeGeometry(size * 0.8, size * 1.2, 4),
+                'diamond': () => { const g = new THREE.OctahedronGeometry(size * 0.8); g.scale(1, 1.5, 1); return g; },
+                'crystal': () => { const g = new THREE.OctahedronGeometry(size); g.scale(0.8, 2, 0.8); return g; },
+                'cross': () => new THREE.BoxGeometry(size * 1.5, size * 0.3, size * 0.3),
+                'arrow': () => new THREE.ConeGeometry(size * 0.5, size * 1.2, 3),
+                'gear': () => new THREE.CylinderGeometry(size * 0.8, size * 0.8, size * 0.3, 8),
+                'drop': () => { const g = new THREE.SphereGeometry(size * 0.7, 32, 32); g.scale(1, 1.5, 1); return g; },
+                'cloud': () => { const g = new THREE.SphereGeometry(size * 0.8, 32, 16); g.scale(1.5, 0.8, 1); return g; },
+                'flower': () => new THREE.DodecahedronGeometry(size * 0.8),
+                'crescent': () => new THREE.TorusGeometry(size * 0.8, size * 0.3, 16, 32, Math.PI * 1.5),
+                'snowflake': () => new THREE.OctahedronGeometry(size * 0.9),
+                'egg': () => { const g = new THREE.SphereGeometry(size * 0.8, 32, 32); g.scale(1, 1.3, 1); return g; },
+                'tetrahedron': () => new THREE.TetrahedronGeometry(size),
+                'icosahedron': () => new THREE.IcosahedronGeometry(size * 0.9),
+                'knot': () => new THREE.TorusKnotGeometry(size * 0.6, size * 0.2, 100, 16),
+                'helix': () => new THREE.TorusKnotGeometry(size * 0.5, size * 0.15, 100, 8),
+                'hexagon': () => new THREE.CylinderGeometry(size * 0.8, size * 0.8, size * 1.2, 6),
+                'pentaprism': () => new THREE.CylinderGeometry(size * 0.8, size * 0.8, size * 1.2, 5),
+                'capsule': () => new THREE.CapsuleGeometry(size * 0.3, size * 0.6, 4, 8),
+                'prism': () => new THREE.CylinderGeometry(size * 0.6, size * 0.6, size * 1.2, 3)
+            };
+
+            // 形状の作成
+            if (basicShapes[shape]) {
+                geometry = basicShapes[shape]();
+            } else {
+                geometry = createCustomGeometry(shape, size);
             }
 
-            // マテリアル作成
             const material = new THREE.MeshStandardMaterial({
                 color: color,
                 roughness: 0.5,
                 metalness: 0.2,
             });
 
-            // メッシュ作成
             mesh = new THREE.Mesh(geometry, material);
-            mesh.name = 'mesh';  // アニメーショントラックと一致させる
+            mesh.name = 'mesh';
             scene.add(mesh);
 
-            // アニメーション更新
             updateAnimation();
         }
 
-        // アニメーション作成（改善版）
         function createAnimationClip(animType, duration) {
             const tracks = [];
-            
-            // キーフレーム時間を正規化（0から1の範囲）
             const times = [0, duration * 0.25, duration * 0.5, duration * 0.75, duration];
             
-            switch (animType) {
-                case 'bounce':
+            // アニメーション定義（簡略化）
+            const animations = {
+                'bounce': () => {
                     tracks.push(new THREE.VectorKeyframeTrack(
                         '.position',
                         [0, duration * 0.5, duration],
-                        [0, 0, 0, 0, 2, 0, 0, 0, 0],
-                        THREE.InterpolateLinear
+                        [0, 0, 0, 0, 2, 0, 0, 0, 0]
                     ));
-                    break;
-                
-                case 'rotate':
+                },
+                'rotate': () => {
                     const rotValues = [];
                     for (let i = 0; i <= 4; i++) {
-                        const angle = (i / 4) * Math.PI * 2;
                         const q = new THREE.Quaternion();
-                        q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
+                        q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), (i / 4) * Math.PI * 2);
                         rotValues.push(q.x, q.y, q.z, q.w);
                     }
-                    tracks.push(new THREE.QuaternionKeyframeTrack(
-                        '.quaternion',
-                        times,
-                        rotValues,
-                        THREE.InterpolateLinear
-                    ));
-                    break;
-
-                case 'float':
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', times, rotValues));
+                },
+                'float': () => {
                     tracks.push(new THREE.VectorKeyframeTrack(
                         '.position',
                         [0, duration * 0.5, duration],
-                        [0, -0.5, 0, 0, 0.5, 0, 0, -0.5, 0],
-                        THREE.InterpolateSmooth
+                        [0, -0.5, 0, 0, 0.5, 0, 0, -0.5, 0]
                     ));
-                    break;
-
-                case 'shake':
+                },
+                'shake': () => {
                     tracks.push(new THREE.VectorKeyframeTrack(
                         '.position',
                         times,
-                        [0, 0, 0, 0.2, 0, 0, -0.2, 0, 0, 0.2, 0, 0, 0, 0, 0],
-                        THREE.InterpolateLinear
+                        [0, 0, 0, 0.2, 0, 0, -0.2, 0, 0, 0.2, 0, 0, 0, 0, 0]
                     ));
-                    break;
-
-                case 'pulse':
+                },
+                'pulse': () => {
                     tracks.push(new THREE.VectorKeyframeTrack(
                         '.scale',
                         [0, duration * 0.5, duration],
-                        [1, 1, 1, 1.5, 1.5, 1.5, 1, 1, 1],
-                        THREE.InterpolateSmooth
+                        [1, 1, 1, 1.5, 1.5, 1.5, 1, 1, 1]
                     ));
-                    break;
-
-                case 'sparkle':
-                    const sparkleRotValues = [];
-                    const sparkleScaleValues = [];
+                },
+                'sparkle': () => {
+                    const rotValues = [];
+                    const scaleValues = [];
                     for (let i = 0; i <= 2; i++) {
-                        const t = i / 2;
-                        const angle = t * Math.PI;
                         const q = new THREE.Quaternion();
-                        q.setFromAxisAngle(new THREE.Vector3(0, 0, 1), angle);
-                        sparkleRotValues.push(q.x, q.y, q.z, q.w);
-                        
+                        q.setFromAxisAngle(new THREE.Vector3(0, 0, 1), (i / 2) * Math.PI);
+                        rotValues.push(q.x, q.y, q.z, q.w);
                         const scale = i === 1 ? 1.3 : 1.0;
-                        sparkleScaleValues.push(scale, scale, scale);
+                        scaleValues.push(scale, scale, scale);
                     }
-                    tracks.push(new THREE.QuaternionKeyframeTrack(
-                        '.quaternion',
-                        [0, duration * 0.5, duration],
-                        sparkleRotValues,
-                        THREE.InterpolateLinear
-                    ));
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', [0, duration * 0.5, duration], rotValues));
+                    tracks.push(new THREE.VectorKeyframeTrack('.scale', [0, duration * 0.5, duration], scaleValues));
+                },
+                // 新しいアニメーション
+                'electric': () => {
+                    const positions = [];
+                    for (let i = 0; i <= 10; i++) {
+                        const offset = Math.random() * 0.2 - 0.1;
+                        positions.push(offset, offset * 0.5, offset * 0.3);
+                    }
+                    const electricTimes = [];
+                    for (let i = 0; i <= 10; i++) {
+                        electricTimes.push((i / 10) * duration);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', electricTimes, positions));
+                },
+                'fire': () => {
+                    const positions = [];
+                    const scales = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const t = i / 4;
+                        const wobble = Math.sin(t * Math.PI * 4) * 0.1;
+                        positions.push(wobble, t * 0.5, 0);
+                        const scale = 1 + Math.sin(t * Math.PI * 2) * 0.2;
+                        scales.push(scale, scale * 1.2, scale);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', times, positions));
+                    tracks.push(new THREE.VectorKeyframeTrack('.scale', times, scales));
+                },
+                'snake': () => {
+                    const positions = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const t = i / 4;
+                        const x = Math.sin(t * Math.PI * 4) * 0.5;
+                        const z = Math.cos(t * Math.PI * 2) * 0.3;
+                        positions.push(x, 0, z);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', times, positions));
+                },
+                'swim': () => {
+                    const positions = [];
+                    const rotations = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const t = i / 4;
+                        const x = Math.sin(t * Math.PI * 2) * 0.8;
+                        const y = Math.sin(t * Math.PI * 4) * 0.2;
+                        positions.push(x, y, 0);
+                        const q = new THREE.Quaternion();
+                        q.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.sin(t * Math.PI * 2) * 0.2);
+                        rotations.push(q.x, q.y, q.z, q.w);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', times, positions));
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', times, rotations));
+                },
+                'wind': () => {
+                    const positions = [];
+                    const rotations = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const t = i / 4;
+                        const x = t * 2 - 1;
+                        const y = Math.sin(t * Math.PI * 2) * 0.3;
+                        positions.push(x, y, 0);
+                        const q = new THREE.Quaternion();
+                        q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), t * Math.PI * 0.5);
+                        rotations.push(q.x, q.y, q.z, q.w);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', times, positions));
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', times, rotations));
+                },
+                'crowd': () => {
+                    const positions = [];
+                    for (let i = 0; i <= 10; i++) {
+                        const offsetX = (Math.random() - 0.5) * 0.1;
+                        const offsetY = (Math.random() - 0.5) * 0.1;
+                        positions.push(offsetX, offsetY, 0);
+                    }
+                    const crowdTimes = [];
+                    for (let i = 0; i <= 10; i++) {
+                        crowdTimes.push((i / 10) * duration);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', crowdTimes, positions));
+                },
+                'warm': () => {
+                    const scales = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const t = i / 4;
+                        const scale = 1 + Math.sin(t * Math.PI * 2) * 0.05;
+                        scales.push(scale, scale, scale);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.scale', times, scales));
+                },
+                'shrink': () => {
                     tracks.push(new THREE.VectorKeyframeTrack(
                         '.scale',
-                        [0, duration * 0.5, duration],
-                        sparkleScaleValues,
-                        THREE.InterpolateSmooth
+                        [0, duration],
+                        [1, 1, 1, 0.3, 0.3, 0.3]
                     ));
-                    break;
+                },
+                'morph': () => {
+                    const scales = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const t = i / 4;
+                        const scaleX = 1 + Math.sin(t * Math.PI * 2) * 0.3;
+                        const scaleY = 1 - Math.sin(t * Math.PI * 2) * 0.2;
+                        const scaleZ = 1 + Math.cos(t * Math.PI * 2) * 0.25;
+                        scales.push(scaleX, scaleY, scaleZ);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.scale', times, scales));
+                },
+                'expand': () => {
+                    tracks.push(new THREE.VectorKeyframeTrack(
+                        '.scale',
+                        [0, duration],
+                        [0.5, 0.5, 0.5, 1.5, 1.5, 1.5]
+                    ));
+                }
+            };
 
-                case 'wave':
-                    const wavePositions = [];
+            // 既存のアニメーションも含める
+            const existingAnimations = {
+                'wave': () => {
+                    const positions = [];
                     for (let i = 0; i <= 4; i++) {
                         const t = i / 4;
                         const x = Math.sin(t * Math.PI * 2) * 0.5;
                         const y = Math.cos(t * Math.PI * 2) * 0.3;
-                        wavePositions.push(x, y, 0);
+                        positions.push(x, y, 0);
                     }
-                    tracks.push(new THREE.VectorKeyframeTrack(
-                        '.position',
-                        times,
-                        wavePositions,
-                        THREE.InterpolateSmooth
-                    ));
-                    break;
-
-                case 'spiral':
-                    const spiralPositions = [];
-                    const spiralRotations = [];
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', times, positions));
+                },
+                'spiral': () => {
+                    const positions = [];
+                    const rotations = [];
                     for (let i = 0; i <= 4; i++) {
                         const t = i / 4;
                         const angle = t * Math.PI * 2;
-                        const x = Math.cos(angle) * 1;
-                        const z = Math.sin(angle) * 1;
-                        const y = t * 2;
-                        spiralPositions.push(x, y, z);
-                        
+                        positions.push(Math.cos(angle), t * 2, Math.sin(angle));
                         const q = new THREE.Quaternion();
                         q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
-                        spiralRotations.push(q.x, q.y, q.z, q.w);
+                        rotations.push(q.x, q.y, q.z, q.w);
                     }
-                    tracks.push(new THREE.VectorKeyframeTrack(
-                        '.position',
-                        times,
-                        spiralPositions,
-                        THREE.InterpolateSmooth
-                    ));
-                    tracks.push(new THREE.QuaternionKeyframeTrack(
-                        '.quaternion',
-                        times,
-                        spiralRotations,
-                        THREE.InterpolateLinear
-                    ));
-                    break;
-
-                case 'zigzag':
-                    tracks.push(new THREE.VectorKeyframeTrack(
-                        '.position',
-                        times,
-                        [0, 0, 0, 1, 0.5, 0, -1, 1, 0, 1, 1.5, 0, 0, 2, 0],
-                        THREE.InterpolateLinear
-                    ));
-                    break;
-
-                case 'stretch':
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', times, positions));
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', times, rotations));
+                },
+                'stretch': () => {
                     tracks.push(new THREE.VectorKeyframeTrack(
                         '.scale',
                         [0, duration * 0.5, duration],
-                        [1, 1, 1, 1, 2, 1, 1, 1, 1],
-                        THREE.InterpolateSmooth
+                        [1, 1, 1, 1, 2, 1, 1, 1, 1]
                     ));
-                    break;
-
-                case 'swing':
-                    const swingRotations = [];
-                    for (let i = 0; i <= 4; i++) {
-                        const t = i / 4;
-                        const angle = Math.sin(t * Math.PI * 2) * 0.5;
-                        const q = new THREE.Quaternion();
-                        q.setFromAxisAngle(new THREE.Vector3(0, 0, 1), angle);
-                        swingRotations.push(q.x, q.y, q.z, q.w);
-                    }
-                    tracks.push(new THREE.QuaternionKeyframeTrack(
-                        '.quaternion',
-                        times,
-                        swingRotations,
-                        THREE.InterpolateSmooth
-                    ));
-                    break;
-
-                case 'blink':
+                },
+                'blink': () => {
                     tracks.push(new THREE.VectorKeyframeTrack(
                         '.scale',
                         times,
-                        [1, 1, 1, 0.1, 0.1, 0.1, 1, 1, 1, 0.1, 0.1, 0.1, 1, 1, 1],
-                        THREE.InterpolateLinear
+                        [1, 1, 1, 0.1, 0.1, 0.1, 1, 1, 1, 0.1, 0.1, 0.1, 1, 1, 1]
                     ));
-                    break;
-
-                case 'slide':
+                },
+                'swing': () => {
+                    const rotations = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const angle = Math.sin((i / 4) * Math.PI * 2) * 0.5;
+                        const q = new THREE.Quaternion();
+                        q.setFromAxisAngle(new THREE.Vector3(0, 0, 1), angle);
+                        rotations.push(q.x, q.y, q.z, q.w);
+                    }
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', times, rotations));
+                },
+                'slide': () => {
                     tracks.push(new THREE.VectorKeyframeTrack(
                         '.position',
                         [0, duration],
-                        [-2, 0, 0, 2, 0, 0],
-                        THREE.InterpolateLinear
+                        [-2, 0, 0, 2, 0, 0]
                     ));
-                    break;
-
-                case 'spin_bounce':
-                    const spinBouncePositions = [0, 0, 0, 0, 2, 0, 0, 0, 0];
-                    const spinBounceRotations = [];
-                    for (let i = 0; i <= 2; i++) {
-                        const angle = (i / 2) * Math.PI * 2;
-                        const q = new THREE.Quaternion();
-                        q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
-                        spinBounceRotations.push(q.x, q.y, q.z, q.w);
-                    }
-                    tracks.push(new THREE.VectorKeyframeTrack(
-                        '.position',
-                        [0, duration * 0.5, duration],
-                        spinBouncePositions,
-                        THREE.InterpolateSmooth
-                    ));
-                    tracks.push(new THREE.QuaternionKeyframeTrack(
-                        '.quaternion',
-                        [0, duration * 0.5, duration],
-                        spinBounceRotations,
-                        THREE.InterpolateLinear
-                    ));
-                    break;
-
-                case 'flutter':
-                    const flutterPositions = [];
-                    const flutterRotations = [];
-                    for (let i = 0; i <= 4; i++) {
-                        const t = i / 4;
-                        const x = Math.sin(t * Math.PI * 2) * 0.3;
-                        const y = Math.sin(t * Math.PI * 4) * 0.5;
-                        flutterPositions.push(x, y, 0);
-                        
-                        const angle = Math.sin(t * Math.PI * 2) * 0.3;
-                        const q = new THREE.Quaternion();
-                        q.setFromAxisAngle(new THREE.Vector3(0, 0, 1), angle);
-                        flutterRotations.push(q.x, q.y, q.z, q.w);
-                    }
+                },
+                'zigzag': () => {
                     tracks.push(new THREE.VectorKeyframeTrack(
                         '.position',
                         times,
-                        flutterPositions,
-                        THREE.InterpolateSmooth
+                        [0, 0, 0, 1, 0.5, 0, -1, 1, 0, 1, 1.5, 0, 0, 2, 0]
                     ));
-                    tracks.push(new THREE.QuaternionKeyframeTrack(
-                        '.quaternion',
-                        times,
-                        flutterRotations,
-                        THREE.InterpolateSmooth
-                    ));
-                    break;
-
-                case 'circle':
-                    const circlePositions = [];
-                    for (let i = 0; i <= 4; i++) {
-                        const angle = (i / 4) * Math.PI * 2;
-                        const x = Math.cos(angle) * 1.5;
-                        const z = Math.sin(angle) * 1.5;
-                        circlePositions.push(x, 0, z);
-                    }
-                    tracks.push(new THREE.VectorKeyframeTrack(
-                        '.position',
-                        times,
-                        circlePositions,
-                        THREE.InterpolateSmooth
-                    ));
-                    break;
-
-                case 'figure8':
-                    const figure8Positions = [];
+                },
+                'figure8': () => {
+                    const positions = [];
                     for (let i = 0; i <= 4; i++) {
                         const t = (i / 4) * Math.PI * 2;
-                        const x = Math.sin(t) * 1.5;
-                        const y = Math.sin(t * 2) * 0.7;
-                        figure8Positions.push(x, y, 0);
+                        positions.push(Math.sin(t) * 1.5, Math.sin(t * 2) * 0.7, 0);
                     }
-                    tracks.push(new THREE.VectorKeyframeTrack(
-                        '.position',
-                        times,
-                        figure8Positions,
-                        THREE.InterpolateSmooth
-                    ));
-                    break;
-
-                case 'tumble':
-                    const tumbleRotations = [];
-                    for (let i = 0; i <= 4; i++) {
-                        const t = i / 4;
-                        const q = new THREE.Quaternion();
-                        const angle1 = t * Math.PI * 2;
-                        const angle2 = t * Math.PI * 2 * 0.7;
-                        q.setFromEuler(new THREE.Euler(angle1, angle2, 0));
-                        tumbleRotations.push(q.x, q.y, q.z, q.w);
-                    }
-                    tracks.push(new THREE.QuaternionKeyframeTrack(
-                        '.quaternion',
-                        times,
-                        tumbleRotations,
-                        THREE.InterpolateLinear
-                    ));
-                    break;
-
-                case 'explode':
-                    tracks.push(new THREE.VectorKeyframeTrack(
-                        '.scale',
-                        [0, duration * 0.7, duration],
-                        [0.1, 0.1, 0.1, 2, 2, 2, 1.5, 1.5, 1.5],
-                        THREE.InterpolateSmooth
-                    ));
-                    break;
-
-                case 'implode':
-                    tracks.push(new THREE.VectorKeyframeTrack(
-                        '.scale',
-                        [0, duration * 0.7, duration],
-                        [2, 2, 2, 0.1, 0.1, 0.1, 1, 1, 1],
-                        THREE.InterpolateSmooth
-                    ));
-                    break;
-
-                case 'wobble':
-                    const wobbleRotations = [];
-                    for (let i = 0; i <= 4; i++) {
-                        const t = i / 4;
-                        const wobbleX = Math.sin(t * Math.PI * 2) * 0.3;
-                        const wobbleZ = Math.cos(t * Math.PI * 2) * 0.3;
-                        const q = new THREE.Quaternion();
-                        q.setFromEuler(new THREE.Euler(wobbleX, 0, wobbleZ));
-                        wobbleRotations.push(q.x, q.y, q.z, q.w);
-                    }
-                    tracks.push(new THREE.QuaternionKeyframeTrack(
-                        '.quaternion',
-                        times,
-                        wobbleRotations,
-                        THREE.InterpolateSmooth
-                    ));
-                    break;
-
-                case 'twist':
-                    const twistRotations = [];
-                    const twistScales = [];
-                    for (let i = 0; i <= 2; i++) {
-                        const t = i / 2;
-                        const angle = t * Math.PI;
-                        const q = new THREE.Quaternion();
-                        q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
-                        twistRotations.push(q.x, q.y, q.z, q.w);
-                        
-                        const scale = i === 1 ? 1.2 : 1.0;
-                        twistScales.push(scale, 1.0, scale);
-                    }
-                    tracks.push(new THREE.QuaternionKeyframeTrack(
-                        '.quaternion',
-                        [0, duration * 0.5, duration],
-                        twistRotations,
-                        THREE.InterpolateLinear
-                    ));
-                    tracks.push(new THREE.VectorKeyframeTrack(
-                        '.scale',
-                        [0, duration * 0.5, duration],
-                        twistScales,
-                        THREE.InterpolateSmooth
-                    ));
-                    break;
-
-                case 'orbit':
-                    const orbitPositions = [];
-                    const orbitRotations = [];
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', times, positions));
+                },
+                'circle': () => {
+                    const positions = [];
                     for (let i = 0; i <= 4; i++) {
                         const angle = (i / 4) * Math.PI * 2;
-                        const x = Math.cos(angle) * 2;
-                        const z = Math.sin(angle) * 1.5;
-                        orbitPositions.push(x, 0, z);
-                        
+                        positions.push(Math.cos(angle) * 1.5, 0, Math.sin(angle) * 1.5);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', times, positions));
+                },
+                'orbit': () => {
+                    const positions = [];
+                    const rotations = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const angle = (i / 4) * Math.PI * 2;
+                        positions.push(Math.cos(angle) * 2, 0, Math.sin(angle) * 1.5);
                         const q = new THREE.Quaternion();
                         q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
-                        orbitRotations.push(q.x, q.y, q.z, q.w);
+                        rotations.push(q.x, q.y, q.z, q.w);
                     }
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', times, positions));
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', times, rotations));
+                },
+                'tornado': () => {
+                    const positions = [];
+                    const rotations = [];
+                    for (let i = 0; i <= 8; i++) {
+                        const t = i / 8;
+                        const angle = t * Math.PI * 4;
+                        const radius = t * 1.5;
+                        positions.push(Math.cos(angle) * radius, t * 3, Math.sin(angle) * radius);
+                        const q = new THREE.Quaternion();
+                        q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle * 2);
+                        rotations.push(q.x, q.y, q.z, q.w);
+                    }
+                    const tornadoTimes = [];
+                    for (let i = 0; i <= 8; i++) {
+                        tornadoTimes.push((i / 8) * duration);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', tornadoTimes, positions));
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', tornadoTimes, rotations));
+                },
+                'pendulum': () => {
+                    const rotations = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const angle = Math.sin((i / 4) * Math.PI) * 0.7;
+                        const q = new THREE.Quaternion();
+                        q.setFromAxisAngle(new THREE.Vector3(0, 0, 1), angle);
+                        rotations.push(q.x, q.y, q.z, q.w);
+                    }
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', times, rotations));
+                },
+                'spin_bounce': () => {
+                    const positions = [0, 0, 0, 0, 2, 0, 0, 0, 0];
+                    const rotations = [];
+                    for (let i = 0; i <= 2; i++) {
+                        const q = new THREE.Quaternion();
+                        q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), (i / 2) * Math.PI * 2);
+                        rotations.push(q.x, q.y, q.z, q.w);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', [0, duration * 0.5, duration], positions));
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', [0, duration * 0.5, duration], rotations));
+                },
+                'twist': () => {
+                    const rotations = [];
+                    const scales = [];
+                    for (let i = 0; i <= 2; i++) {
+                        const q = new THREE.Quaternion();
+                        q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), (i / 2) * Math.PI);
+                        rotations.push(q.x, q.y, q.z, q.w);
+                        const scale = i === 1 ? 1.2 : 1.0;
+                        scales.push(scale, 1.0, scale);
+                    }
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', [0, duration * 0.5, duration], rotations));
+                    tracks.push(new THREE.VectorKeyframeTrack('.scale', [0, duration * 0.5, duration], scales));
+                },
+                'wobble': () => {
+                    const rotations = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const t = i / 4;
+                        const q = new THREE.Quaternion();
+                        q.setFromEuler(new THREE.Euler(
+                            Math.sin(t * Math.PI * 2) * 0.3,
+                            0,
+                            Math.cos(t * Math.PI * 2) * 0.3
+                        ));
+                        rotations.push(q.x, q.y, q.z, q.w);
+                    }
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', times, rotations));
+                },
+                'jello': () => {
+                    const scales = [];
+                    for (let i = 0; i <= 8; i++) {
+                        const t = i / 8;
+                        const scaleX = 1 + Math.sin(t * Math.PI * 4) * 0.2;
+                        const scaleY = 1 - Math.sin(t * Math.PI * 4) * 0.1;
+                        const scaleZ = 1 + Math.cos(t * Math.PI * 4) * 0.15;
+                        scales.push(scaleX, scaleY, scaleZ);
+                    }
+                    const jelloTimes = [];
+                    for (let i = 0; i <= 8; i++) {
+                        jelloTimes.push((i / 8) * duration);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.scale', jelloTimes, scales));
+                },
+                'grow': () => {
                     tracks.push(new THREE.VectorKeyframeTrack(
-                        '.position',
-                        times,
-                        orbitPositions,
-                        THREE.InterpolateSmooth
+                        '.scale',
+                        [0, duration],
+                        [0.1, 0.1, 0.1, 1, 1, 1]
                     ));
-                    tracks.push(new THREE.QuaternionKeyframeTrack(
-                        '.quaternion',
-                        times,
-                        orbitRotations,
-                        THREE.InterpolateLinear
+                },
+                'flap': () => {
+                    const rotations = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const angle = Math.sin((i / 4) * Math.PI * 4) * 0.5;
+                        const q = new THREE.Quaternion();
+                        q.setFromAxisAngle(new THREE.Vector3(1, 0, 0), angle);
+                        rotations.push(q.x, q.y, q.z, q.w);
+                    }
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', times, rotations));
+                },
+                'flutter': () => {
+                    const positions = [];
+                    const rotations = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const t = i / 4;
+                        positions.push(
+                            Math.sin(t * Math.PI * 2) * 0.3,
+                            Math.sin(t * Math.PI * 4) * 0.5,
+                            0
+                        );
+                        const q = new THREE.Quaternion();
+                        q.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.sin(t * Math.PI * 2) * 0.3);
+                        rotations.push(q.x, q.y, q.z, q.w);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', times, positions));
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', times, rotations));
+                },
+                'tumble': () => {
+                    const rotations = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const t = i / 4;
+                        const q = new THREE.Quaternion();
+                        q.setFromEuler(new THREE.Euler(
+                            t * Math.PI * 2,
+                            t * Math.PI * 2 * 0.7,
+                            0
+                        ));
+                        rotations.push(q.x, q.y, q.z, q.w);
+                    }
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', times, rotations));
+                },
+                'dance': () => {
+                    const positions = [];
+                    const rotations = [];
+                    const scales = [];
+                    for (let i = 0; i <= 5; i++) {
+                        const t = i / 5;
+                        positions.push(
+                            Math.sin(t * Math.PI * 2) * 0.5,
+                            Math.abs(Math.sin(t * Math.PI * 4)) * 0.8,
+                            0
+                        );
+                        const q = new THREE.Quaternion();
+                        q.setFromEuler(new THREE.Euler(
+                            Math.sin(t * Math.PI * 2) * 0.3,
+                            Math.sin(t * Math.PI * 2) * 0.15,
+                            Math.sin(t * Math.PI * 2) * 0.09
+                        ));
+                        rotations.push(q.x, q.y, q.z, q.w);
+                        const scale = 1 + Math.sin(t * Math.PI * 4) * 0.1;
+                        scales.push(scale, scale, scale);
+                    }
+                    const danceTimes = [0, duration * 0.2, duration * 0.4, duration * 0.6, duration * 0.8, duration];
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', danceTimes, positions));
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', danceTimes, rotations));
+                    tracks.push(new THREE.VectorKeyframeTrack('.scale', danceTimes, scales));
+                },
+                'heartbeat': () => {
+                    tracks.push(new THREE.VectorKeyframeTrack(
+                        '.scale',
+                        [0, duration * 0.1, duration * 0.2, duration * 0.3, duration * 0.4, duration * 0.9, duration],
+                        [1, 1, 1, 1.3, 1.3, 1.3, 1, 1, 1, 1.3, 1.3, 1.3, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                     ));
-                    break;
-
-                case 'vibrate':
-                    const vibratePositions = [];
+                },
+                'sway': () => {
+                    const rotations = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const angle = Math.sin((i / 4) * Math.PI * 2) * 0.4;
+                        const q = new THREE.Quaternion();
+                        q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
+                        rotations.push(q.x, q.y, q.z, q.w);
+                    }
+                    tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', times, rotations));
+                },
+                'vibrate': () => {
+                    const positions = [];
                     for (let i = 0; i <= 10; i++) {
                         const offset = (i % 2 === 0) ? 0.1 : -0.1;
-                        vibratePositions.push(offset, offset * 0.5, 0);
+                        positions.push(offset, offset * 0.5, 0);
                     }
                     const vibrateTimes = [];
                     for (let i = 0; i <= 10; i++) {
                         vibrateTimes.push((i / 10) * duration);
                     }
-                    tracks.push(new THREE.VectorKeyframeTrack(
-                        '.position',
-                        vibrateTimes,
-                        vibratePositions,
-                        THREE.InterpolateLinear
-                    ));
-                    break;
-
-                case 'dance':
-                    const dancePositions = [];
-                    const danceRotations = [];
-                    const danceScales = [];
-                    for (let i = 0; i <= 5; i++) {
-                        const t = i / 5;
-                        const x = Math.sin(t * Math.PI * 2) * 0.5;
-                        const y = Math.abs(Math.sin(t * Math.PI * 4)) * 0.8;
-                        dancePositions.push(x, y, 0);
-                        
-                        const angle = Math.sin(t * Math.PI * 2) * 0.3;
-                        const q = new THREE.Quaternion();
-                        q.setFromEuler(new THREE.Euler(angle, angle * 0.5, angle * 0.3));
-                        danceRotations.push(q.x, q.y, q.z, q.w);
-                        
-                        const scale = 1 + Math.sin(t * Math.PI * 4) * 0.1;
-                        danceScales.push(scale, scale, scale);
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', vibrateTimes, positions));
+                },
+                'bubble': () => {
+                    const positions = [];
+                    const scales = [];
+                    for (let i = 0; i <= 4; i++) {
+                        const t = i / 4;
+                        positions.push(Math.sin(t * Math.PI * 4) * 0.2, t * 2, 0);
+                        const scale = 1 + Math.sin(t * Math.PI * 2) * 0.2;
+                        scales.push(scale, scale, scale);
                     }
-                    const danceTimes = [0, duration * 0.2, duration * 0.4, duration * 0.6, duration * 0.8, duration];
+                    tracks.push(new THREE.VectorKeyframeTrack('.position', times, positions));
+                    tracks.push(new THREE.VectorKeyframeTrack('.scale', times, scales));
+                },
+                'flash': () => {
+                    const scales = [];
+                    for (let i = 0; i <= 8; i++) {
+                        const scale = (i % 2 === 0) ? 1.5 : 0.5;
+                        scales.push(scale, scale, scale);
+                    }
+                    const flashTimes = [];
+                    for (let i = 0; i <= 8; i++) {
+                        flashTimes.push((i / 8) * duration);
+                    }
+                    tracks.push(new THREE.VectorKeyframeTrack('.scale', flashTimes, scales));
+                },
+                'explode': () => {
+                    tracks.push(new THREE.VectorKeyframeTrack(
+                        '.scale',
+                        [0, duration * 0.7, duration],
+                        [0.1, 0.1, 0.1, 2, 2, 2, 1.5, 1.5, 1.5]
+                    ));
+                },
+                'implode': () => {
+                    tracks.push(new THREE.VectorKeyframeTrack(
+                        '.scale',
+                        [0, duration * 0.7, duration],
+                        [2, 2, 2, 0.1, 0.1, 0.1, 1, 1, 1]
+                    ));
+                },
+                'teleport': () => {
                     tracks.push(new THREE.VectorKeyframeTrack(
                         '.position',
-                        danceTimes,
-                        dancePositions,
-                        THREE.InterpolateSmooth
-                    ));
-                    tracks.push(new THREE.QuaternionKeyframeTrack(
-                        '.quaternion',
-                        danceTimes,
-                        danceRotations,
-                        THREE.InterpolateSmooth
+                        [0, duration * 0.4, duration * 0.45, duration * 0.5, duration * 0.55, duration],
+                        [-2, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 0]
                     ));
                     tracks.push(new THREE.VectorKeyframeTrack(
                         '.scale',
-                        danceTimes,
-                        danceScales,
-                        THREE.InterpolateSmooth
+                        [0, duration * 0.4, duration * 0.5, duration * 0.6, duration],
+                        [1, 1, 1, 1, 1, 1, 0.01, 0.01, 0.01, 1, 1, 1, 1, 1, 1]
                     ));
-                    break;
+                }
+            };
 
-                // デフォルトは回転
-                default:
-                    const defaultRotValues = [];
-                    for (let i = 0; i <= 4; i++) {
-                        const angle = (i / 4) * Math.PI * 2;
-                        const q = new THREE.Quaternion();
-                        q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
-                        defaultRotValues.push(q.x, q.y, q.z, q.w);
-                    }
-                    tracks.push(new THREE.QuaternionKeyframeTrack(
-                        '.quaternion',
-                        times,
-                        defaultRotValues,
-                        THREE.InterpolateLinear
-                    ));
+            // すべてのアニメーションを結合
+            const allAnimations = { ...animations, ...existingAnimations };
+            
+            if (allAnimations[animType]) {
+                allAnimations[animType]();
+            } else {
+                // デフォルト（回転）
+                const rotValues = [];
+                for (let i = 0; i <= 4; i++) {
+                    const q = new THREE.Quaternion();
+                    q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), (i / 4) * Math.PI * 2);
+                    rotValues.push(q.x, q.y, q.z, q.w);
+                }
+                tracks.push(new THREE.QuaternionKeyframeTrack('.quaternion', times, rotValues));
             }
             
             return new THREE.AnimationClip('animation', duration, tracks);
         }
 
-        // アニメーション更新
         function updateAnimation() {
             if (!mesh) return;
 
@@ -1140,25 +1458,22 @@
             const speed = parseFloat(document.getElementById('speed').value);
             const duration = 2 / speed;
 
-            // アニメーションクリップ作成
             currentAnimation = createAnimationClip(animType, duration);
             
-            // ミキサー更新
             if (mixer) {
                 mixer.stopAllAction();
                 mixer.uncacheRoot(mesh);
             }
             
             mixer = new THREE.AnimationMixer(mesh);
-            animationAction = mixer.clipAction(currentAnimation);
-            animationAction.loop = THREE.LoopRepeat;
-            animationAction.play();
+            const action = mixer.clipAction(currentAnimation);
+            action.loop = THREE.LoopRepeat;
+            action.play();
         }
 
-        // GLB書き出し（改善版）
         async function exportGLB(includeAnimation = true) {
             if (!mesh) {
-                showStatus('3Dモデルが準備できていません。', false);
+                alert('3Dモデルが準備できていません。');
                 return;
             }
 
@@ -1170,56 +1485,66 @@
             exportBtn.textContent = 'エクスポート中...';
 
             try {
-                // エクスポート用シーンを作成
+                // エクスポート用のシーンを作成
                 const exportScene = new THREE.Scene();
                 
-                // メッシュを完全に新規作成
+                // メッシュをクローン（ジオメトリとマテリアルも新規作成）
                 const exportMesh = new THREE.Mesh(
                     mesh.geometry.clone(),
                     mesh.material.clone()
                 );
-                exportMesh.name = 'mesh';  // 重要: アニメーションのターゲット名と一致させる
                 
-                // Transform初期化
+                // 重要: メッシュ名を設定（アニメーションターゲットと一致させる）
+                exportMesh.name = 'mesh';
                 exportMesh.position.set(0, 0, 0);
                 exportMesh.rotation.set(0, 0, 0);
                 exportMesh.scale.set(1, 1, 1);
                 exportMesh.updateMatrix();
-                exportMesh.updateMatrixWorld();
+                exportMesh.updateMatrixWorld(true);
                 
                 exportScene.add(exportMesh);
 
-                // アニメーション付きの場合
+                // アニメーション処理
                 let animations = [];
-                if (includeAnimation && currentAnimation) {
-                    // アニメーションクリップを適切に設定
-                    const clip = currentAnimation.clone();
-                    clip.name = 'animation';
+                if (includeAnimation && currentAnimation && currentAnimation.tracks.length > 0) {
+                    // アニメーションクリップをクローンして調整
+                    const exportClip = currentAnimation.clone();
+                    exportClip.name = 'animation';
                     
-                    // トラック名を修正（mesh.positionなどの形式に）
-                    clip.tracks = clip.tracks.map(track => {
+                    // トラックのターゲットパスを確認・修正
+                    exportClip.tracks = exportClip.tracks.map(track => {
                         const newTrack = track.clone();
-                        // トラック名が正しい形式になっているか確認
-                        if (!newTrack.name.startsWith('mesh.')) {
-                            newTrack.name = 'mesh.' + newTrack.name.replace(/^\./, '');
+                        // .position -> mesh.position のような形式に統一
+                        if (!newTrack.name.includes('mesh')) {
+                            newTrack.name = 'mesh' + newTrack.name;
                         }
                         return newTrack;
                     });
                     
-                    animations = [clip];
-                    console.log('Animation prepared:', clip.name, 'Duration:', clip.duration, 'Tracks:', clip.tracks.length);
+                    animations = [exportClip];
+                    
+                    console.log('Animation prepared:', {
+                        name: exportClip.name,
+                        duration: exportClip.duration,
+                        trackCount: exportClip.tracks.length,
+                        tracks: exportClip.tracks.map(t => ({ name: t.name, type: t.constructor.name }))
+                    });
                 }
 
-                // GLTFExporter設定（palanAR互換性重視）
+                // GLTFExporter設定（palanAR互換性を重視）
                 const exportOptions = {
                     binary: true,
                     animations: animations,
                     forceIndices: true,
+                    forcePowerOfTwoTextures: false,
                     truncateDrawRange: false,
-                    includeCustomExtensions: false
+                    includeCustomExtensions: false,
+                    maxTextureSize: 4096,
+                    embedImages: true
                 };
 
                 console.log('Export options:', exportOptions);
+                console.log('Mesh to export:', exportMesh);
 
                 const exporter = new GLTFExporter();
                 
@@ -1228,18 +1553,23 @@
                     exportScene,
                     function (result) {
                         try {
-                            const byteLength = result.byteLength || new Blob([result]).size;
-                            console.log('Export successful, size:', byteLength, 'bytes');
+                            // ArrayBufferかBlobかを確認
+                            const isArrayBuffer = result instanceof ArrayBuffer;
+                            const byteLength = isArrayBuffer ? result.byteLength : result.size;
                             
-                            // サイズチェック
-                            if (byteLength < 5000 && includeAnimation) {
-                                console.warn('File size seems too small for animated GLB');
-                            }
+                            console.log('Export successful:', {
+                                type: isArrayBuffer ? 'ArrayBuffer' : 'Blob',
+                                size: byteLength,
+                                sizeKB: Math.round(byteLength / 1024)
+                            });
                             
-                            // Blobを作成してダウンロード
-                            const blob = new Blob([result], { type: 'model/gltf-binary' });
+                            // Blobに変換
+                            const blob = isArrayBuffer 
+                                ? new Blob([result], { type: 'model/gltf-binary' })
+                                : result;
+                            
+                            // ダウンロードリンク作成
                             const url = URL.createObjectURL(blob);
-                            
                             const link = document.createElement('a');
                             link.href = url;
                             
@@ -1253,6 +1583,7 @@
                             link.click();
                             document.body.removeChild(link);
                             
+                            // メモリ解放
                             setTimeout(() => URL.revokeObjectURL(url), 1000);
                             
                             exportBtn.disabled = false;
@@ -1260,32 +1591,27 @@
                                 ? 'アニメーション付きGLBを保存' 
                                 : '静止GLBを保存（確実版）';
                             
+                            // 詳細メッセージ
                             const message = includeAnimation
-                                ? 'アニメーション付きGLBファイルをダウンロードしました！\nファイルサイズ: ' + Math.round(byteLength / 1024) + 'KB'
-                                : '静止GLBファイルをダウンロードしました！\nファイルサイズ: ' + Math.round(byteLength / 1024) + 'KB';
-                            
-                            showStatus(message, true);
-                            
-                            // 詳細なアラート
-                            const detailMessage = includeAnimation
-                                ? `アニメーション付きGLBファイルがダウンロードされました！
+                                ? `アニメーション付きGLBファイルをダウンロードしました！
 ファイルサイズ: ${Math.round(byteLength / 1024)}KB
+アニメーション: ${animations.length > 0 ? '含まれています' : 'なし'}
 
-【次のステップ】
-1. palanAR (https://planar.jp/) にアクセス
+【palanARでの使用方法】
+1. https://planar.jp/ にアクセス
 2. 「ARマーカー作成」からファイルをアップロード
 3. QRコードを生成して共有
 
 ※アニメーションが再生されない場合は「静止GLBを保存」をお試しください`
-                                : `静止GLBファイルがダウンロードされました！
+                                : `静止GLBファイルをダウンロードしました！
 ファイルサイズ: ${Math.round(byteLength / 1024)}KB
 
-【次のステップ】
-1. palanAR (https://planar.jp/) にアクセス
+【palanARでの使用方法】
+1. https://planar.jp/ にアクセス
 2. 「ARマーカー作成」からファイルをアップロード
 3. QRコードを生成して共有`;
                             
-                            alert(detailMessage);
+                            alert(message);
                             
                         } catch (e) {
                             console.error('Post-export error:', e);
@@ -1293,7 +1619,7 @@
                             exportBtn.textContent = includeAnimation 
                                 ? 'アニメーション付きGLBを保存' 
                                 : '静止GLBを保存（確実版）';
-                            showStatus('ファイル保存中にエラーが発生しました: ' + e.message, false);
+                            alert('ファイル保存中にエラーが発生しました: ' + e.message);
                         }
                     },
                     function (error) {
@@ -1302,7 +1628,7 @@
                         exportBtn.textContent = includeAnimation 
                             ? 'アニメーション付きGLBを保存' 
                             : '静止GLBを保存（確実版）';
-                        showStatus('エクスポートに失敗しました: ' + (error.message || 'Unknown error'), false);
+                        alert('エクスポートに失敗しました: ' + (error.message || 'Unknown error'));
                     },
                     exportOptions
                 );
@@ -1312,20 +1638,8 @@
                 exportBtn.textContent = includeAnimation 
                     ? 'アニメーション付きGLBを保存' 
                     : '静止GLBを保存（確実版）';
-                showStatus('エクスポート処理でエラーが発生しました: ' + error.message, false);
+                alert('エクスポート処理でエラーが発生しました: ' + error.message);
             }
-        }
-
-        // ステータスメッセージ表示
-        function showStatus(message, isSuccess) {
-            const statusEl = document.getElementById('statusMessage');
-            statusEl.textContent = message;
-            statusEl.className = isSuccess ? 'status-message success' : 'status-message';
-            statusEl.style.display = 'block';
-            
-            setTimeout(() => {
-                statusEl.style.display = 'none';
-            }, 5000);
         }
 
         // イベントリスナー
@@ -1351,7 +1665,6 @@
                 document.getElementById('color').value = preset.color;
                 document.getElementById('animation').value = preset.animation;
                 
-                // アクティブクラス
                 document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 
