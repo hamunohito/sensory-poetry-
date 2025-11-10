@@ -23,6 +23,44 @@
             display: flex;
             flex-direction: column;
         }
+        
+        /* タブレット・PC用：左右分割レイアウト */
+        @media (min-width: 768px) {
+            #mainContent {
+                flex-direction: row !important;
+            }
+            
+            #canvas-container {
+                width: 60% !important;
+                height: 100% !important;
+                min-height: auto !important;
+            }
+            
+            #controls {
+                width: 40% !important;
+                height: 100% !important;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            #canvas-container {
+                width: 65% !important;
+            }
+            
+            #controls {
+                width: 35% !important;
+            }
+        }
+        
+        @media (min-width: 1440px) {
+            #canvas-container {
+                width: 70% !important;
+            }
+            
+            #controls {
+                width: 30% !important;
+            }
+        }
 
         #header {
             padding: 15px;
@@ -136,7 +174,7 @@
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
-        #exportBtn, #exportStaticBtn {
+        #exportBtn, #exportZipBtn {
             width: 100%;
             padding: 14px;
             font-size: 16px;
@@ -150,16 +188,16 @@
             transition: all 0.3s;
         }
 
-        #exportStaticBtn {
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        #exportZipBtn {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
         }
 
-        #exportBtn:hover, #exportStaticBtn:hover {
+        #exportBtn:hover, #exportZipBtn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        #exportBtn:disabled, #exportStaticBtn:disabled {
+        #exportBtn:disabled, #exportZipBtn:disabled {
             background: #cbd5e0;
             cursor: not-allowed;
             transform: none;
@@ -409,8 +447,8 @@
                 </div>
 
                 <!-- エクスポートボタン -->
-                <button id="exportBtn">アニメーション付きGLBを保存</button>
-                <button id="exportStaticBtn">静止GLBを保存（確実版）</button>
+                <button id="exportBtn">💾 GLB保存</button>
+                <button id="exportZipBtn">💾 ZIP保存 (iPadOS推奨)</button>
 
                 <!-- 使い方 -->
                 <div class="info-box">
@@ -422,6 +460,7 @@
     </div>
 
     <!-- Import Map for Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script type="importmap">
     {
         "imports": {
@@ -1471,15 +1510,16 @@
             action.play();
         }
 
-        async function exportGLB(includeAnimation = true) {
+        async function exportGLB(formatType = 'glb') {
             if (!mesh) {
                 alert('3Dモデルが準備できていません。');
                 return;
             }
 
-            const exportBtn = includeAnimation 
-                ? document.getElementById('exportBtn') 
-                : document.getElementById('exportStaticBtn');
+            const isBinary = formatType === 'glb';
+            const exportBtn = isBinary 
+                ? document.getElementById('exportBtn')
+                : document.getElementById('exportZipBtn');
             
             exportBtn.disabled = true;
             exportBtn.textContent = 'エクスポート中...';
@@ -1506,7 +1546,7 @@
 
                 // アニメーション処理
                 let animations = [];
-                if (includeAnimation && currentAnimation && currentAnimation.tracks.length > 0) {
+                if (currentAnimation && currentAnimation.tracks.length > 0) {
                     // アニメーションクリップをクローンして調整
                     const exportClip = currentAnimation.clone();
                     exportClip.name = 'animation';
@@ -1533,7 +1573,7 @@
 
                 // GLTFExporter設定（palanAR互換性を重視）
                 const exportOptions = {
-                    binary: true,
+                    binary: isBinary,
                     animations: animations,
                     forceIndices: true,
                     forcePowerOfTwoTextures: false,
@@ -1551,94 +1591,126 @@
                 // エクスポート実行
                 exporter.parse(
                     exportScene,
-                    function (result) {
+                    async function (result) {
                         try {
-                            // ArrayBufferかBlobかを確認
-                            const isArrayBuffer = result instanceof ArrayBuffer;
-                            const byteLength = isArrayBuffer ? result.byteLength : result.size;
+                            let blob;
+                            let finalFileName;
+                            let finalMimeType;
+                            const timestamp = new Date().toISOString()
+                                .replace(/[:.]/g, '-')
+                                .slice(0, 19);
                             
+                            if (isBinary) {
+                                // GLB: バイナリ形式
+                                const isArrayBuffer = result instanceof ArrayBuffer;
+                                blob = isArrayBuffer 
+                                    ? new Blob([result], { type: 'model/gltf-binary' })
+                                    : result;
+                                finalFileName = `sensory-poetry-${timestamp}.glb`;
+                                finalMimeType = 'model/gltf-binary';
+                            } else {
+                                // GLTF: JSON形式 → ZIP圧縮
+                                const output = JSON.stringify(result, null, 2);
+                                const gltfFileName = `sensory-poetry-${timestamp}.gltf`;
+                                
+                                if (typeof JSZip !== 'undefined') {
+                                    const zip = new JSZip();
+                                    zip.file(gltfFileName, output);
+                                    
+                                    blob = await zip.generateAsync({ 
+                                        type: 'blob',
+                                        compression: 'DEFLATE',
+                                        compressionOptions: { level: 9 }
+                                    });
+                                    
+                                    finalFileName = `sensory-poetry-${timestamp}.zip`;
+                                    finalMimeType = 'application/zip';
+                                    console.log('GLTF compressed to ZIP');
+                                } else {
+                                    blob = new Blob([output], { type: 'model/gltf+json' });
+                                    finalFileName = gltfFileName;
+                                    finalMimeType = 'model/gltf+json';
+                                    console.warn('JSZip not available');
+                                }
+                            }
+                            
+                            const byteLength = blob.size;
                             console.log('Export successful:', {
-                                type: isArrayBuffer ? 'ArrayBuffer' : 'Blob',
+                                format: isBinary ? 'GLB' : 'GLTF-ZIP',
                                 size: byteLength,
                                 sizeKB: Math.round(byteLength / 1024)
                             });
                             
-                            // Blobに変換
-                            const blob = isArrayBuffer 
-                                ? new Blob([result], { type: 'model/gltf-binary' })
-                                : result;
+                            // デバイス判定
+                            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
                             
-                            // ダウンロードリンク作成
+                            // iOS Share API
+                            if (isIOS && navigator.share) {
+                                try {
+                                    const file = new File([blob], finalFileName, { 
+                                        type: finalMimeType,
+                                        lastModified: Date.now()
+                                    });
+                                    
+                                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                                        await navigator.share({
+                                            files: [file],
+                                            title: `感覚の詩 (${isBinary ? 'GLB' : 'GLTF-ZIP'})`,
+                                            text: animations.length > 0 ? 'アニメーション付き3Dモデル' : '3Dモデル'
+                                        });
+                                        
+                                        exportBtn.disabled = false;
+                                        exportBtn.textContent = isBinary ? '💾 GLB保存' : '💾 ZIP保存 (iPadOS推奨)';
+                                        
+                                        alert(`✅ 共有しました（${isBinary ? 'GLB' : 'GLTF-ZIP'}形式）\n\nファイル名: ${finalFileName}\nサイズ: ${Math.round(byteLength / 1024)}KB\nアニメーション: ${animations.length > 0 ? 'あり' : 'なし'}\n\n【palanARで使用】\n1. https://planar.jp/ にアクセス\n2. 「ARマーカー作成」からアップロード\n3. ${isBinary ? '' : 'ZIPファイルをそのままアップロード'}`);
+                                        return;
+                                    }
+                                } catch (error) {
+                                    if (error.name !== 'AbortError') {
+                                        console.log('Share error:', error);
+                                    }
+                                }
+                            }
+                            
+                            // 標準ダウンロード
                             const url = URL.createObjectURL(blob);
                             const link = document.createElement('a');
                             link.href = url;
-                            
-                            const timestamp = new Date().toISOString()
-                                .replace(/[:.]/g, '-')
-                                .slice(0, 19);
-                            const suffix = includeAnimation ? 'animated' : 'static';
-                            link.download = `sensory-poetry-${suffix}-${timestamp}.glb`;
+                            link.download = finalFileName;
+                            link.style.display = 'none';
                             
                             document.body.appendChild(link);
                             link.click();
                             document.body.removeChild(link);
                             
-                            // メモリ解放
                             setTimeout(() => URL.revokeObjectURL(url), 1000);
                             
                             exportBtn.disabled = false;
-                            exportBtn.textContent = includeAnimation 
-                                ? 'アニメーション付きGLBを保存' 
-                                : '静止GLBを保存（確実版）';
+                            exportBtn.textContent = isBinary ? '💾 GLB保存' : '💾 ZIP保存 (iPadOS推奨)';
                             
-                            // 詳細メッセージ
-                            const message = includeAnimation
-                                ? `アニメーション付きGLBファイルをダウンロードしました！
-ファイルサイズ: ${Math.round(byteLength / 1024)}KB
-アニメーション: ${animations.length > 0 ? '含まれています' : 'なし'}
-
-【palanARでの使用方法】
-1. https://planar.jp/ にアクセス
-2. 「ARマーカー作成」からファイルをアップロード
-3. QRコードを生成して共有
-
-※アニメーションが再生されない場合は「静止GLBを保存」をお試しください`
-                                : `静止GLBファイルをダウンロードしました！
-ファイルサイズ: ${Math.round(byteLength / 1024)}KB
-
-【palanARでの使用方法】
-1. https://planar.jp/ にアクセス
-2. 「ARマーカー作成」からファイルをアップロード
-3. QRコードを生成して共有`;
+                            const formatInfo = isBinary ? 'GLB形式' : 'GLTF-ZIP形式（palanAR対応）';
+                            alert(`✅ ダウンロード完了\n\n形式: ${formatInfo}\nファイル名: ${finalFileName}\nサイズ: ${Math.round(byteLength / 1024)}KB\nアニメーション: ${animations.length > 0 ? 'あり' : 'なし'}\n\n【palanARでの使用】\n1. https://planar.jp/ にアクセス\n2. 「ARマーカー作成」からアップロード\n${!isBinary ? '3. ZIPファイルをそのままアップロード\n4. palanARが自動的に展開します' : ''}\n\n${isIOS && isBinary ? '※iPadOS 18でGLBが選択できない場合は\nZIP保存をお試しください' : ''}`);
                             
-                            alert(message);
-                            
-                        } catch (e) {
-                            console.error('Post-export error:', e);
+                        } catch (error) {
+                            console.error('Download error:', error);
+                            alert('ダウンロード中にエラーが発生しました: ' + error.message);
                             exportBtn.disabled = false;
-                            exportBtn.textContent = includeAnimation 
-                                ? 'アニメーション付きGLBを保存' 
-                                : '静止GLBを保存（確実版）';
-                            alert('ファイル保存中にエラーが発生しました: ' + e.message);
+                            exportBtn.textContent = isBinary ? '💾 GLB保存' : '💾 ZIP保存 (iPadOS推奨)';
                         }
                     },
                     function (error) {
                         console.error('Export error:', error);
+                        alert('エクスポート中にエラーが発生しました: ' + error.message);
                         exportBtn.disabled = false;
-                        exportBtn.textContent = includeAnimation 
-                            ? 'アニメーション付きGLBを保存' 
-                            : '静止GLBを保存（確実版）';
-                        alert('エクスポートに失敗しました: ' + (error.message || 'Unknown error'));
+                        exportBtn.textContent = isBinary ? '💾 GLB保存' : '💾 ZIP保存 (iPadOS推奨)';
                     },
                     exportOptions
                 );
             } catch (error) {
-                console.error('Export exception:', error);
+                console.error('Preparation error:', error);
+                alert('準備中にエラーが発生しました: ' + error.message);
                 exportBtn.disabled = false;
-                exportBtn.textContent = includeAnimation 
-                    ? 'アニメーション付きGLBを保存' 
-                    : '静止GLBを保存（確実版）';
-                alert('エクスポート処理でエラーが発生しました: ' + error.message);
+                exportBtn.textContent = isBinary ? '💾 GLB保存' : '💾 ZIP保存 (iPadOS推奨)';
             }
         }
 
@@ -1654,6 +1726,10 @@
             document.getElementById('speedValue').textContent = parseFloat(this.value).toFixed(1);
             updateAnimation();
         });
+
+        // エクスポートボタンのイベントリスナー
+        document.getElementById('exportBtn').addEventListener('click', () => exportGLB('glb'));
+        document.getElementById('exportZipBtn').addEventListener('click', () => exportGLB('gltf'));
 
         // プリセットボタン
         document.querySelectorAll('.preset-btn').forEach(btn => {
@@ -1671,10 +1747,6 @@
                 updateMesh();
             });
         });
-
-        // エクスポートボタン
-        document.getElementById('exportBtn').addEventListener('click', () => exportGLB(true));
-        document.getElementById('exportStaticBtn').addEventListener('click', () => exportGLB(false));
 
         // 初期化実行
         init();
