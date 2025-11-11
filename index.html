@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>感覚の詩 ARメーカー v4 - Ultimate</title>
+    <title>感覚の詩 ARメーカー v5 - Enhanced</title>
     <style>
         * {
             margin: 0;
@@ -245,7 +245,8 @@
 <body>
     <div id="container">
         <div id="header">
-            <h1>感覚の詩 ARメーカー v4 - Ultimate</h1>
+            <h1>感覚の詩 ARメーカー v5 - Enhanced</h1>
+            <p>直方体・スケール調整・GLBインポート対応</p>
             <p>オノマトペから3Dモデルとアニメーションをつくろう</p>
         </div>
 
@@ -306,6 +307,16 @@
                     </div>
                 </div>
 
+                <!-- GLBインポート -->
+                <div class="control-group" style="background-color: #edf2f7; padding: 15px; border-radius: 8px;">
+                    <label for="glbImport" style="font-size: 14px;">📁 GLBファイルをインポート</label>
+                    <input type="file" id="glbImport" accept=".glb,.gltf" style="margin-top: 8px; font-size: 13px;" />
+                    <button id="clearImport" style="margin-top: 8px; padding: 8px 12px; font-size: 12px; background: #e53e3e; color: white; border: none; border-radius: 6px; cursor: pointer;">インポートをクリア</button>
+                    <div style="font-size: 12px; color: #718096; margin-top: 8px; line-height: 1.5;">
+                        GLB/GLTFファイルを読み込んで編集できます。
+                    </div>
+                </div>
+
                 <!-- 形状 -->
                 <div class="control-group">
                     <label for="shape">形（40種類）</label>
@@ -313,6 +324,7 @@
                         <optgroup label="基本形状">
                             <option value="sphere">球</option>
                             <option value="box">立方体</option>
+                            <option value="cuboid">直方体</option>
                             <option value="cylinder">円柱</option>
                             <option value="cone">円錐</option>
                             <option value="octahedron">八面体</option>
@@ -368,6 +380,12 @@
                 <div class="control-group">
                     <label for="color">色</label>
                     <input type="color" id="color" value="#ff6b6b">
+                    <div style="margin-top: 8px;">
+                        <label style="display: flex; align-items: center; font-weight: normal; font-size: 13px;">
+                            <input type="checkbox" id="applyColorToImported" style="margin-right: 6px; width: auto; height: auto;">
+                            インポートしたモデルに色を適用（元のテクスチャが失われます）
+                        </label>
+                    </div>
                 </div>
 
                 <!-- アニメーション -->
@@ -446,6 +464,28 @@
                     <input type="range" id="size" min="0.5" max="2" step="0.1" value="1">
                 </div>
 
+                <!-- スケール調整 -->
+                <div class="control-group">
+                    <label>📐 形状の変形（横・縦・高さ）</label>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <label style="font-size: 12px; margin-bottom: 5px; color: #4a5568;">横幅 (X)</label>
+                            <input type="range" id="scaleX" min="0.5" max="3" step="0.1" value="1" style="width: 100%;">
+                            <span id="scaleXValue" style="font-size: 11px; color: #718096; margin-top: 3px;">1.0</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <label style="font-size: 12px; margin-bottom: 5px; color: #4a5568;">高さ (Y)</label>
+                            <input type="range" id="scaleY" min="0.5" max="3" step="0.1" value="1" style="width: 100%;">
+                            <span id="scaleYValue" style="font-size: 11px; color: #718096; margin-top: 3px;">1.0</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <label style="font-size: 12px; margin-bottom: 5px; color: #4a5568;">奥行 (Z)</label>
+                            <input type="range" id="scaleZ" min="0.5" max="3" step="0.1" value="1" style="width: 100%;">
+                            <span id="scaleZValue" style="font-size: 11px; color: #718096; margin-top: 3px;">1.0</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- エクスポートボタン -->
                 <button id="exportBtn">💾 GLB保存</button>
                 <button id="exportZipBtn">💾 ZIP保存 (iPadOS推奨)</button>
@@ -473,9 +513,12 @@
     <script type="module">
         import * as THREE from 'three';
         import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
         let scene, camera, renderer, mesh, mixer, clock;
         let currentAnimation = null;
+        let scaleXValue = 1, scaleYValue = 1, scaleZValue = 1;
+        let importedModel = null;
 
         // プリセット（拡張版）
         const presets = [
@@ -908,8 +951,15 @@
         function updateMesh() {
             if (mesh) {
                 scene.remove(mesh);
-                mesh.geometry.dispose();
-                mesh.material.dispose();
+                // 通常の形状の場合のみdispose（インポートモデルはdisposeしない）
+                if (!importedModel && mesh.geometry && mesh.material) {
+                    mesh.geometry.dispose();
+                    if (Array.isArray(mesh.material)) {
+                        mesh.material.forEach(mat => mat.dispose());
+                    } else {
+                        mesh.material.dispose();
+                    }
+                }
             }
 
             const shape = document.getElementById('shape').value;
@@ -922,6 +972,7 @@
             const basicShapes = {
                 'sphere': () => new THREE.SphereGeometry(size, 32, 32),
                 'box': () => new THREE.BoxGeometry(size, size, size),
+                'cuboid': () => new THREE.BoxGeometry(size, size, size),
                 'cylinder': () => new THREE.CylinderGeometry(size * 0.5, size * 0.5, size * 1.5, 32),
                 'cone': () => new THREE.ConeGeometry(size * 0.7, size * 1.5, 32),
                 'octahedron': () => new THREE.OctahedronGeometry(size),
@@ -963,9 +1014,45 @@
                 metalness: 0.2,
             });
 
-            mesh = new THREE.Mesh(geometry, material);
-            mesh.name = 'mesh';
+            // インポートモデルがある場合はそれを使用
+            if (importedModel) {
+                // インポートモデルを深くクローン（すべての子オブジェクトを含む）
+                mesh = importedModel.clone(true);
+                mesh.name = 'mesh';
+                
+                // 色変更チェックボックスの値を確認
+                const applyColor = document.getElementById('applyColorToImported').checked;
+                if (applyColor) {
+                    mesh.traverse((child) => {
+                        if (child.isMesh) {
+                            child.material = material.clone();
+                        }
+                    });
+                }
+            } else {
+                mesh = new THREE.Mesh(geometry, material);
+                mesh.name = 'mesh';
+            }
+            
+            // スケールを適用
+            scaleXValue = parseFloat(document.getElementById('scaleX').value);
+            scaleYValue = parseFloat(document.getElementById('scaleY').value);
+            scaleZValue = parseFloat(document.getElementById('scaleZ').value);
+            mesh.scale.set(scaleXValue, scaleYValue, scaleZValue);
+            
+            // 位置をリセット
+            mesh.position.set(0, 0, 0);
+            mesh.rotation.set(0, 0, 0);
+            
             scene.add(mesh);
+            
+            console.log('Mesh updated:', {
+                isImported: !!importedModel,
+                meshName: mesh.name,
+                scale: { x: scaleXValue, y: scaleYValue, z: scaleZValue },
+                childrenCount: mesh.children ? mesh.children.length : 0,
+                visible: mesh.visible
+            });
 
             updateAnimation();
         }
@@ -1491,7 +1578,16 @@
         }
 
         function updateAnimation() {
-            if (!mesh) return;
+            if (!mesh) {
+                console.warn('updateAnimation: mesh is null');
+                return;
+            }
+
+            console.log('updateAnimation called:', {
+                meshExists: !!mesh,
+                meshVisible: mesh.visible,
+                meshInScene: scene.children.includes(mesh)
+            });
 
             const animType = document.getElementById('animation').value;
             const speed = parseFloat(document.getElementById('speed').value);
@@ -1528,17 +1624,24 @@
                 // エクスポート用のシーンを作成
                 const exportScene = new THREE.Scene();
                 
-                // メッシュをクローン（ジオメトリとマテリアルも新規作成）
-                const exportMesh = new THREE.Mesh(
-                    mesh.geometry.clone(),
-                    mesh.material.clone()
-                );
+                // メッシュをクローン
+                let exportMesh;
+                if (importedModel) {
+                    // インポートモデルの場合は完全にクローン（深いクローン）
+                    exportMesh = mesh.clone(true);
+                } else {
+                    // 通常の形状の場合
+                    exportMesh = new THREE.Mesh(
+                        mesh.geometry.clone(),
+                        mesh.material.clone()
+                    );
+                }
                 
                 // 重要: メッシュ名を設定（アニメーションターゲットと一致させる）
                 exportMesh.name = 'mesh';
                 exportMesh.position.set(0, 0, 0);
                 exportMesh.rotation.set(0, 0, 0);
-                exportMesh.scale.set(1, 1, 1);
+                exportMesh.scale.set(scaleXValue, scaleYValue, scaleZValue);
                 exportMesh.updateMatrix();
                 exportMesh.updateMatrixWorld(true);
                 
@@ -1717,6 +1820,7 @@
         // イベントリスナー
         document.getElementById('shape').addEventListener('change', updateMesh);
         document.getElementById('color').addEventListener('input', updateMesh);
+        document.getElementById('applyColorToImported').addEventListener('change', updateMesh);
         document.getElementById('animation').addEventListener('change', updateAnimation);
         document.getElementById('size').addEventListener('input', function() {
             document.getElementById('sizeValue').textContent = this.value;
@@ -1725,6 +1829,67 @@
         document.getElementById('speed').addEventListener('input', function() {
             document.getElementById('speedValue').textContent = parseFloat(this.value).toFixed(1);
             updateAnimation();
+        });
+
+        // スケール調整のイベントリスナー
+        document.getElementById('scaleX').addEventListener('input', function() {
+            document.getElementById('scaleXValue').textContent = this.value;
+            updateMesh();
+        });
+        document.getElementById('scaleY').addEventListener('input', function() {
+            document.getElementById('scaleYValue').textContent = this.value;
+            updateMesh();
+        });
+        document.getElementById('scaleZ').addEventListener('input', function() {
+            document.getElementById('scaleZValue').textContent = this.value;
+            updateMesh();
+        });
+
+        // GLBインポートのイベントリスナー
+        document.getElementById('glbImport').addEventListener('change', async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const arrayBuffer = e.target.result;
+                const loader = new GLTFLoader();
+                
+                loader.parse(arrayBuffer, '', function(gltf) {
+                    console.log('GLB loaded:', gltf);
+                    console.log('Scene structure:', {
+                        childrenCount: gltf.scene.children.length,
+                        sceneType: gltf.scene.type,
+                        children: gltf.scene.children.map(c => ({
+                            name: c.name,
+                            type: c.type,
+                            childrenCount: c.children ? c.children.length : 0
+                        }))
+                    });
+                    
+                    // シーン全体を保持（テクスチャやマテリアルを含む）
+                    importedModel = gltf.scene;
+                    
+                    // メッシュを更新
+                    updateMesh();
+                    
+                    alert('✅ GLBファイルを読み込みました！\nアニメーションとスケールを変更できます。\n色の変更は元のテクスチャが失われます。');
+                }, function(error) {
+                    console.error('GLB loading error:', error);
+                    alert('❌ ファイルの読み込みに失敗しました。');
+                });
+            };
+            
+            reader.readAsArrayBuffer(file);
+        });
+
+        // インポートクリアボタンのイベントリスナー
+        document.getElementById('clearImport').addEventListener('click', function() {
+            importedModel = null;
+            document.getElementById('glbImport').value = '';
+            document.getElementById('applyColorToImported').checked = false;
+            updateMesh();
+            alert('✅ インポートをクリアしました。');
         });
 
         // エクスポートボタンのイベントリスナー
@@ -1740,6 +1905,14 @@
                 document.getElementById('shape').value = preset.shape;
                 document.getElementById('color').value = preset.color;
                 document.getElementById('animation').value = preset.animation;
+                
+                // スケールをリセット
+                document.getElementById('scaleX').value = 1;
+                document.getElementById('scaleY').value = 1;
+                document.getElementById('scaleZ').value = 1;
+                document.getElementById('scaleXValue').textContent = '1.0';
+                document.getElementById('scaleYValue').textContent = '1.0';
+                document.getElementById('scaleZValue').textContent = '1.0';
                 
                 document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
